@@ -133,9 +133,17 @@ func (d *OGFWDetector) AnalyzePacket(srcIP, dstIP net.IP, srcPort, dstPort uint1
 	}
 
 	if transport == "TCP" {
-		return d.analyzeTCP(state, payload)
+		result := d.analyzeTCP(state, payload)
+		if result != nil {
+			state.done = true
+		}
+		return result
 	}
-	return d.analyzeUDP(state, payload)
+	result := d.analyzeUDP(state, payload)
+	if result != nil {
+		state.done = true
+	}
+	return result
 }
 
 func (d *OGFWDetector) analyzeTCP(state *ogfwFlowState, payload []byte) *AnalyzeResult {
@@ -146,10 +154,7 @@ func (d *OGFWDetector) analyzeTCP(state *ogfwFlowState, payload []byte) *Analyze
 			stream = an.NewTCP(state.info, d.logger)
 			state.tcpStreams[name] = stream
 		}
-		update, done := stream.Feed(false, state.packetCount == 1, false, 0, payload)
-		if done {
-			state.done = true
-		}
+		update, _ := stream.Feed(false, state.packetCount == 1, false, 0, payload)
 		if update != nil && update.M != nil {
 			return resultFromProps(name, update.M)
 		}
@@ -165,10 +170,7 @@ func (d *OGFWDetector) analyzeUDP(state *ogfwFlowState, payload []byte) *Analyze
 			stream = an.NewUDP(state.udpInfo, d.logger)
 			state.udpStreams[name] = stream
 		}
-		update, done := stream.Feed(false, payload)
-		if done {
-			state.done = true
-		}
+		update, _ := stream.Feed(false, payload)
 		if update != nil && update.M != nil {
 			return resultFromProps(name, update.M)
 		}

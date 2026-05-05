@@ -77,7 +77,7 @@ func main() {
 		pipes = append(pipes, pipe)
 	}
 
-	r := reporter.NewGRPCClient(cfg.ServerAddr, cfg.NodeID, pipes, version, tags, 0,
+	r := reporter.NewGRPCClient(cfg.ServerAddr, cfg.NodeID, pipes, version, tags, cfg.SnapshotInterval,
 		cfg.TLSCert, cfg.TLSKey, cfg.TLSCA, cfg.AuthToken)
 
 	if err := r.Connect(ctx); err != nil {

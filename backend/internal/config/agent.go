@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"time"
 )
 
 type AgentConfig struct {
@@ -21,7 +22,8 @@ type AgentConfig struct {
 	Intercept   bool
 	InterceptLocal bool
 	InterceptRST   bool
-	AuthToken    string // shared secret for node authentication
+	AuthToken         string        // shared secret for node authentication
+	SnapshotInterval  time.Duration // snapshot reporting interval to server
 }
 
 func ParseAgentFlags() *AgentConfig {
@@ -38,6 +40,7 @@ func ParseAgentFlags() *AgentConfig {
 	flag.StringVar(&cfg.TLSKey, "tls-key", "", "mTLS key path")
 	flag.StringVar(&cfg.TLSCA, "tls-ca", "", "mTLS CA certificate path (enables mutual TLS when set)")
 	flag.StringVar(&cfg.ProtoEngine, "proto-engine", "ndpi", "Protocol detection engine: ndpi, opengfw, both")
+	flag.DurationVar(&cfg.SnapshotInterval, "snapshot-interval", 1*time.Second, "Snapshot report interval (e.g. 1s, 5s, 10s, 1m)")
 	flag.BoolVar(&cfg.Intercept, "intercept", false, "Enable traffic interception (requires root)")
 	flag.BoolVar(&cfg.InterceptLocal, "intercept-local", false, "Local mode for interception (INPUT/OUTPUT chains)")
 	flag.BoolVar(&cfg.InterceptRST, "intercept-rst", false, "Send TCP RST for blocked connections")
@@ -62,6 +65,8 @@ func ParseAgentFlags() *AgentConfig {
 	return cfg
 }
 
+var blockedIfaces = []string{"veth", "docker", "br-", "tun", "tap", "virbr", "vnet"}
+
 func discoverInterfaces() []string {
 	interfaces, err := net.Interfaces()
 	if err != nil {
@@ -73,6 +78,16 @@ func discoverInterfaces() []string {
 			continue
 		}
 		if iface.Flags&net.FlagLoopback != 0 {
+			continue
+		}
+		var skip bool
+		for _, prefix := range blockedIfaces {
+			if strings.HasPrefix(iface.Name, prefix) {
+				skip = true
+				break
+			}
+		}
+		if skip {
 			continue
 		}
 		names = append(names, iface.Name)

@@ -200,18 +200,19 @@ func httpEnrich(p *ParsedPacket) string {
 
 func (a *Analyzer) classifyApp(srcPort, dstPort uint16, payload []byte, transport string, p *ParsedPacket, packet gopacket.Packet) string {
 	// Try OpenGFW analyzers first if configured
+	var ogfwSaved *AnalyzeResult
 	if a.ogfwDetector != nil && (a.protoEngine == "opengfw" || a.protoEngine == "both") {
-		result := a.ogfwDetector.AnalyzePacket(p.SrcIP, p.DstIP, srcPort, dstPort, payload, transport)
-		if result != nil && result.ProtoName != "" {
-			a.enrichFromOGFW(result, p)
+		ogfwSaved = a.ogfwDetector.AnalyzePacket(p.SrcIP, p.DstIP, srcPort, dstPort, payload, transport)
+		if ogfwSaved != nil && ogfwSaved.ProtoName != "" {
+			a.enrichFromOGFW(ogfwSaved, p)
 			if a.protoEngine == "opengfw" {
-				return result.ProtoName
+				return ogfwSaved.ProtoName
 			}
-			// For "both" mode, still fall through to nDPI for better results
-			if result.ProtoName != "Encrypted" && result.ProtoName != "" {
-				return result.ProtoName
+			// For "both" mode, non-Encrypted results return immediately;
+			// Encrypted (FET) falls through to let nDPI try a better match.
+			if ogfwSaved.ProtoName != "Encrypted" {
+				return ogfwSaved.ProtoName
 			}
-			// For Encrypted (FET), let nDPI try too
 		}
 	}
 
@@ -223,13 +224,9 @@ func (a *Analyzer) classifyApp(srcPort, dstPort uint16, payload []byte, transpor
 		}
 	}
 
-	// Fallback to OpenGFW if nDPI failed and we're in "both" mode
-	if a.ogfwDetector != nil && a.protoEngine == "both" {
-		result := a.ogfwDetector.AnalyzePacket(p.SrcIP, p.DstIP, srcPort, dstPort, payload, transport)
-		if result != nil && result.ProtoName != "" {
-			a.enrichFromOGFW(result, p)
-			return result.ProtoName
-		}
+	// Use saved OpenGFW result (e.g. FET/Encrypted) if nDPI couldn't identify
+	if ogfwSaved != nil && ogfwSaved.ProtoName != "" {
+		return ogfwSaved.ProtoName
 	}
 
 	switch {
