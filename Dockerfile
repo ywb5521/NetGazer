@@ -50,7 +50,7 @@ RUN rm -f /etc/nginx/sites-enabled/default && \
     mkdir -p /var/lib/netgazer/geoip && \
     chown -R netgazer:netgazer /var/lib/netgazer /opt/netgazer
 
-EXPOSE 9527
+EXPOSE 9527 50051
 VOLUME ["/var/lib/netgazer"]
 
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

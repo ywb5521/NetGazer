@@ -4,7 +4,8 @@ services:
     container_name: netgazer
     restart: unless-stopped
     ports:
-      - "9527:9527"     # HTTP + gRPC（单端口，通过 HTTP/2 路径区分）
+      - "9527:9527"     # HTTP（Dashboard / API / WebSocket）
+      - "50051:50051"   # gRPC（Agent 直连 Go server，不经 nginx）
     volumes:
       - netgazer_data:/var/lib/netgazer
     environment:

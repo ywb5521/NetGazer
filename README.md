@@ -119,46 +119,46 @@ Alerts are deduplicated with configurable cooldown and forwarded to notification
 └──────────┬──────────────┬──────────────┬────────────────────┘
            │ REST API     │ WebSocket    │ Static files
            ▼              ▼              ▼
-    ┌──────────────────────────────────────────┐
-    │        nginx + Go Server (Docker)          │
-    │     Port 9527: HTTP + WS + gRPC            │
-    └──────────────────┬───────────────────────────┘
-                       │
-                       ▼
-    ┌──────────────────────────────────────────────┐
-    │           NetGazer Server                    │
-    │     (with built-in static file serving)       │
-    │  ┌─────────┐ ┌──────────┐ ┌───────────────┐  │
-    │  │ HTTP    │ │ WebSocket│ │ Alert Engine   │  │
-    │  │ API     │ │ Hub      │ │ (15+ checks)   │  │
-    │  └────┬────┘ └────┬─────┘ └───────┬───────┘  │
-    │       │           │               │          │
-    │  ┌────┴───────────┴───────────────┴───────┐  │
-    │  │           Aggregator                    │  │
-    │  │  (hosts, flows, protocols, GeoIP, ASN) │  │
-    │  └────────────────┬───────────────────────┘  │
-    │                   │                          │
-    │  ┌────────────────┴───────────────────────┐  │
-    │  │           SQLite Storage               │  │
-    │  │  (snapshots, alerts, config, pools)    │  │
-    │  └────────────────────────────────────────┘  │
-    │                   │                          │
-    │  ┌────────────────┴───────────────────────┐  │
-    │  │     gRPC Receiver  (:50051, internal)   │  │
-    │  └────────────────┬───────────────────────┘  │
-    └───────────────────┼──────────────────────────┘
-                        │ gRPC (bidirectional stream)
-              ┌─────────┴──────────┐
-              │                    │
-    ┌─────────┴──────┐  ┌─────────┴──────┐
-    │ NetGazer Agent │  │ NetGazer Agent │  ...
-    │   (node1)      │  │   (node2)      │
-    │ ┌────────────┐ │  │ ┌────────────┐ │
-    │ │ libpcap    │ │  │ │ libpcap    │ │
-    │ │ nDPI/OGFW  │ │  │ │ nDPI/OGFW  │ │
-    │ │ Health     │ │  │ │ Health     │ │
-    │ └────────────┘ │  │ └────────────┘ │
-    └────────────────┘  └────────────────┘
+    ┌───────────────────────────────────────────────────┐
+    │              nginx (Docker 内部)                   │
+    │            Port 9527: HTTP + WS                    │
+    └──────────────────────┬────────────────────────────┘
+                           │ proxy_pass
+                           ▼
+    ┌──────────────────────────────────────────────────┐
+    │             NetGazer Server                       │
+    │        (with built-in static file serving)         │
+    │  ┌─────────┐ ┌──────────┐ ┌───────────────┐      │
+    │  │ HTTP    │ │ WebSocket│ │ Alert Engine   │      │
+    │  │ API     │ │ Hub      │ │ (15+ checks)   │      │
+    │  └────┬────┘ └────┬─────┘ └───────┬───────┘      │
+    │       │           │               │              │
+    │  ┌────┴───────────┴───────────────┴───────┐      │
+    │  │           Aggregator                    │      │
+    │  │  (hosts, flows, protocols, GeoIP, ASN) │      │
+    │  └────────────────┬───────────────────────┘      │
+    │                   │                              │
+    │  ┌────────────────┴───────────────────────┐      │
+    │  │           SQLite Storage               │      │
+    │  │  (snapshots, alerts, config, pools)    │      │
+    │  └────────────────────────────────────────┘      │
+    │                   │                              │
+    │  ┌────────────────┴───────────────────────┐      │
+    │  │     gRPC Receiver  (:50051)            │◄─────┼──── gRPC (Agent 直连，不经 nginx)
+    │  └────────────────────────────────────────┘      │
+    └──────────────────────────────────────────────────┘
+                           ▲
+              ┌────────────┴──────────┐
+              │                       │
+    ┌─────────┴──────┐     ┌─────────┴──────┐
+    │ NetGazer Agent │     │ NetGazer Agent │  ...
+    │   (node1)      │     │   (node2)      │
+    │ ┌────────────┐ │     │ ┌────────────┐ │
+    │ │ libpcap    │ │     │ │ libpcap    │ │
+    │ │ nDPI/OGFW  │ │     │ │ nDPI/OGFW  │ │
+    │ │ Health     │ │     │ │ Health     │ │
+    │ └────────────┘ │     │ └────────────┘ │
+    └────────────────┘     └────────────────┘
 ```
 
 ---
@@ -184,7 +184,7 @@ tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
 
 ./netgazer-agent \
-  --server-addr <服务器IP>:9527 \
+  --server-addr <服务器IP>:50051 \
   --interfaces eth0 \
   --node-id datacenter-1 \
   --tags production,rack-a
@@ -192,7 +192,12 @@ sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
 
 ### 端口说明
 
-只暴露一个端口 `9527`，同时支持 HTTP 和 gRPC（通过 HTTP/2 路径区分）。外层反代（1panel / 宝塔）只需反代这一个端口即可。
+| 端口 | 协议 | 用途 |
+|------|------|------|
+| `9527` | HTTP/WebSocket | Dashboard 页面、REST API、WebSocket（经 nginx 代理） |
+| `50051` | gRPC | Agent 直连 Go Server（不经 nginx，需 L4 转发） |
+
+外层 HTTP 反代（1panel / 宝塔）只需反代 `9527` 端口。gRPC 端口 `50051` 需要 L4/TCP 层转发或直接暴露，因为 nginx 不支持非 TLS 的 HTTP/2 明文（h2c）升级。
 
 ### 开发模式
 
@@ -285,7 +290,7 @@ docker cp Geolite2-ASN.mmdb netgazer:/var/lib/netgazer/geoip/asn.mmdb
 
 **外层反代（如 1panel / 宝塔）：**
 
-Docker 内部已包含 nginx，外部只需将域名反代到 `http://127.0.0.1:9527` 即可。gRPC 和 HTTP 共用一个端口，通过 HTTP/2 自动区分，不需要额外配置。
+Docker 内部已包含 nginx，外部只需将域名反代到 `http://127.0.0.1:9527` 即可（HTTP/WebSocket）。gRPC 端口 `50051` 需要 L4/TCP 转发或直接暴露给 Agent 连接。
 
 ### Agent（在受监控的机器上）
 
@@ -294,7 +299,7 @@ Docker 内部已包含 nginx，外部只需将域名反代到 `http://127.0.0.1:
 ```bash
 tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
-./netgazer-agent --server-addr <服务器IP>:9527 --interfaces eth0 --node-id my-node
+./netgazer-agent --server-addr <服务器IP>:50051 --interfaces eth0 --node-id my-node
 ```
 
 systemd 服务（推荐）：
@@ -308,7 +313,7 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/opt/netgazer/bin/netgazer-agent \
-  --server-addr mgmt-server:9527 \
+  --server-addr mgmt-server:50051 \
   --interfaces eth0 \
   --node-id %H
 Restart=always
@@ -458,7 +463,7 @@ Add internal subnets to the whitelist or increase the bandwidth/flood thresholds
 
 **Q: Can I run the agent on a different machine from the server?**
 
-Yes. The agent connects to the server via gRPC (`--server-addr <server-ip>:9527`). Docker only exposes port 9527 which handles both HTTP and gRPC traffic.
+Yes. The agent connects to the server via gRPC (`--server-addr <server-ip>:50051`). Docker exposes port 9527 (HTTP/WebSocket via nginx) and port 50051 (gRPC direct to Go server).
 
 **Q: How much data does the SQLite database grow per day?**
 
@@ -523,12 +528,17 @@ docker compose up -d
 ```bash
 tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
-./netgazer-agent --server-addr <服务器IP>:9527 --interfaces eth0 --node-id my-node
+./netgazer-agent --server-addr <服务器IP>:50051 --interfaces eth0 --node-id my-node
 ```
 
 ### 端口说明
 
-只暴露一个端口 `9527`，同时支持 HTTP 和 gRPC（HTTP/2 路径区分）。外层反代只需反代这一个端口。
+| 端口 | 协议 | 用途 |
+|------|------|------|
+| `9527` | HTTP/WebSocket | Dashboard 页面、REST API、WebSocket（经 nginx 代理） |
+| `50051` | gRPC | Agent 直连 Go Server（不经 nginx，需 L4/TCP 转发） |
+
+外层 HTTP 反代只需反代 `9527` 端口。gRPC 端口 `50051` 需要 L4 层转发或直接暴露。
 
 ### GeoIP 数据库
 
@@ -538,4 +548,4 @@ sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
 
 ### 部署
 
-Server 仅支持 Docker 部署：`docker compose up -d` 一键启动，Dashboard → `http://localhost:9527`。Docker 内部已包含 nginx，单个端口 9527 同时承载 HTTP 页面和 gRPC Agent 连接。
+Server 仅支持 Docker 部署：`docker compose up -d` 一键启动，Dashboard → `http://localhost:9527`。Docker 内部已包含 nginx（端口 9527 承载 HTTP/WebSocket），gRPC 端口 50051 由 Go Server 直接暴露供 Agent 连接。
