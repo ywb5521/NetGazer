@@ -3,6 +3,8 @@
 # ============================================================
 FROM golang:1.24-bookworm AS backend-builder
 
+ENV GOTOOLCHAIN=auto
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpcap-dev libndpi-dev \
     && rm -rf /var/lib/apt/lists/*
