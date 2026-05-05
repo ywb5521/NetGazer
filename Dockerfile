@@ -1,9 +1,11 @@
 # ============================================================
 # Stage 1: Build Go backend (server binary)
 # ============================================================
-FROM golang:1.25-alpine AS backend-builder
+FROM golang:1.24-bookworm AS backend-builder
 
-RUN apk add --no-cache gcc musl-dev libpcap-dev
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpcap-dev libndpi-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
 COPY backend/go.mod backend/go.sum ./
@@ -15,7 +17,7 @@ RUN CGO_ENABLED=1 go build -ldflags="-s -w" -o /out/netgazer-server ./cmd/server
 # ============================================================
 # Stage 2: Build frontend
 # ============================================================
-FROM node:22-alpine AS frontend-builder
+FROM node:22-bookworm AS frontend-builder
 
 WORKDIR /src
 COPY frontend/package.json frontend/package-lock.json ./
@@ -27,10 +29,12 @@ RUN npm run build
 # ============================================================
 # Stage 3: Runtime
 # ============================================================
-FROM alpine:3.22
+FROM debian:bookworm-slim
 
-RUN apk add --no-cache libpcap ca-certificates tzdata && \
-    adduser -D -h /var/lib/netgazer netgazer
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpcap0.8 libndpi4.2 ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/* \
+    && adduser --system --home /var/lib/netgazer --no-create-home netgazer
 
 COPY --from=backend-builder /out/netgazer-server /usr/local/bin/netgazer-server
 COPY --from=frontend-builder /src/dist /opt/netgazer/frontend
