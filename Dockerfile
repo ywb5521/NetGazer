@@ -37,7 +37,7 @@ FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpcap0.8 libndpi4.2 ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/* \
-    && adduser --system --home /var/lib/netgazer --no-create-home netgazer
+    && adduser --system --group --home /var/lib/netgazer --no-create-home netgazer
 
 COPY --from=backend-builder /out/netgazer-server /usr/local/bin/netgazer-server
 COPY --from=frontend-builder /src/dist /opt/netgazer/frontend/dist
