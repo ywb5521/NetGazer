@@ -16,7 +16,6 @@ import (
 	"github.com/netgazer/backend/internal/tracker"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 type IfacePipe struct {
@@ -131,7 +130,7 @@ func (c *GRPCClient) Connect(ctx context.Context) error {
 		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(tlsCfg)))
 		log.Printf("[agent] TLS enabled for gRPC connection")
 	} else {
-		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		opts = append(opts, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{})))
 	}
 
 	conn, err := grpc.NewClient(target, opts...)
