@@ -1,4 +1,4 @@
-name: Release Agent
+name: Release
 
 on:
   push:
@@ -24,13 +24,9 @@ jobs:
           - os: linux-amd64
             runner: ubuntu-latest
             goarch: amd64
-            goos: linux
-            cc: x86_64-linux-gnu-gcc
           - os: linux-arm64
             runner: ubuntu-24.04-arm
             goarch: arm64
-            goos: linux
-            cc: aarch64-linux-gnu-gcc
 
     steps:
       - name: Checkout
@@ -44,7 +40,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpcap-dev gcc-${{ matrix.cc }}
+          sudo apt-get install -y libpcap-dev
 
       - name: Determine version
         id: version
@@ -58,9 +54,8 @@ jobs:
       - name: Build agent
         working-directory: backend
         env:
-          GOOS: ${{ matrix.goos }}
+          GOOS: linux
           GOARCH: ${{ matrix.goarch }}
-          CC: ${{ matrix.cc }}
           CGO_ENABLED: 1
         run: |
           go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.value }}" \
@@ -81,10 +76,8 @@ jobs:
         include:
           - goarch: amd64
             runner: ubuntu-latest
-            cc: x86_64-linux-gnu-gcc
           - goarch: arm64
             runner: ubuntu-24.04-arm
-            cc: aarch64-linux-gnu-gcc
 
     steps:
       - name: Checkout
@@ -98,7 +91,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpcap-dev gcc-${{ matrix.cc }}
+          sudo apt-get install -y libpcap-dev
 
       - name: Determine version
         id: version
@@ -114,7 +107,6 @@ jobs:
         env:
           GOOS: linux
           GOARCH: ${{ matrix.goarch }}
-          CC: ${{ matrix.cc }}
           CGO_ENABLED: 1
         run: |
           go build -ldflags="-s -w" \
@@ -168,13 +160,16 @@ jobs:
             ## NetGazer v${{ steps.version.outputs.value }}
 
             ### Agent
-            Download the agent binary for your platform:
-            - `netgazer-agent-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz` — Linux x86_64
-            - `netgazer-agent-v${{ steps.version.outputs.value }}-linux-arm64.tar.gz` — Linux ARM64
+            | Binary | Platform |
+            |--------|----------|
+            | `netgazer-agent-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz` | Linux x86_64 |
+            | `netgazer-agent-v${{ steps.version.outputs.value }}-linux-arm64.tar.gz` | Linux ARM64 |
 
             ### Server
-            - `netgazer-server-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz` — Linux x86_64
-            - `netgazer-server-v${{ steps.version.outputs.value }}-linux-arm64.tar.gz` — Linux ARM64
+            | Binary | Platform |
+            |--------|----------|
+            | `netgazer-server-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz` | Linux x86_64 |
+            | `netgazer-server-v${{ steps.version.outputs.value }}-linux-arm64.tar.gz` | Linux ARM64 |
 
             ### Quick Install
             ```bash
@@ -191,7 +186,7 @@ jobs:
 
             ### Docker
             ```bash
-            docker pull ghcr.io/gtopng/netgazer:v${{ steps.version.outputs.value }}
+            docker compose up -d
             ```
           files: artifacts/*.tar.gz
           draft: false
