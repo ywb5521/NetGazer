@@ -13,25 +13,25 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gtopng/backend/internal/aggregator"
-	"github.com/gtopng/backend/internal/alerting"
-	"github.com/gtopng/backend/internal/api"
-	"github.com/gtopng/backend/internal/collector"
-	"github.com/gtopng/backend/internal/config"
-	"github.com/gtopng/backend/internal/discovery"
-	"github.com/gtopng/backend/internal/geoip"
-	"github.com/gtopng/backend/internal/lua"
-	"github.com/gtopng/backend/internal/models"
-	"github.com/gtopng/backend/internal/receiver"
-	"github.com/gtopng/backend/internal/snmp"
-	"github.com/gtopng/backend/internal/storage"
-	"github.com/gtopng/backend/internal/webhook"
+	"github.com/netgazer/backend/internal/aggregator"
+	"github.com/netgazer/backend/internal/alerting"
+	"github.com/netgazer/backend/internal/api"
+	"github.com/netgazer/backend/internal/collector"
+	"github.com/netgazer/backend/internal/config"
+	"github.com/netgazer/backend/internal/discovery"
+	"github.com/netgazer/backend/internal/geoip"
+	"github.com/netgazer/backend/internal/lua"
+	"github.com/netgazer/backend/internal/models"
+	"github.com/netgazer/backend/internal/receiver"
+	"github.com/netgazer/backend/internal/snmp"
+	"github.com/netgazer/backend/internal/storage"
+	"github.com/netgazer/backend/internal/webhook"
 )
 
 func main() {
 	cfg := config.ParseServerFlags()
 
-	log.Printf("[server] gtopng-server starting")
+	log.Printf("[server] netgazer-server starting")
 	log.Printf("[server] gRPC port: %d | HTTP port: %d | DB: %s", cfg.GRPCPort, cfg.HTTPPort, cfg.DBPath)
 
 	// Storage
@@ -189,7 +189,7 @@ func main() {
 	srv := api.NewServer(cfg, agg, store, alertEng, hub, notifManager)
 	srv.SetLuaEngine(luaEng)
 	srv.SetGeoIPEngine(geoipEng)
-	router := api.NewRouter(srv)
+	router := api.NewRouter(srv, cfg.WebDir)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

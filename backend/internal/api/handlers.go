@@ -14,17 +14,17 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/gtopng/backend/internal/aggregator"
-	"github.com/gtopng/backend/internal/alerting"
-	"github.com/gtopng/backend/internal/auth"
-	"github.com/gtopng/backend/internal/config"
-	"github.com/gtopng/backend/internal/models"
-	"github.com/gtopng/backend/internal/collector"
-	"github.com/gtopng/backend/internal/geoip"
-	"github.com/gtopng/backend/internal/report"
-	"github.com/gtopng/backend/internal/lua"
-	"github.com/gtopng/backend/internal/storage"
-	"github.com/gtopng/backend/internal/webhook"
+	"github.com/netgazer/backend/internal/aggregator"
+	"github.com/netgazer/backend/internal/alerting"
+	"github.com/netgazer/backend/internal/auth"
+	"github.com/netgazer/backend/internal/config"
+	"github.com/netgazer/backend/internal/models"
+	"github.com/netgazer/backend/internal/collector"
+	"github.com/netgazer/backend/internal/geoip"
+	"github.com/netgazer/backend/internal/report"
+	"github.com/netgazer/backend/internal/lua"
+	"github.com/netgazer/backend/internal/storage"
+	"github.com/netgazer/backend/internal/webhook"
 )
 
 type Server struct {

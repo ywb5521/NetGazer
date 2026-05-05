@@ -71,7 +71,7 @@ export function AppContextProvider({ children }: { children: ReactNode }) {
     function connect() {
       // Don't connect if not authenticated
       let token = '';
-      try { token = localStorage.getItem('gtopng-token') || ''; } catch { /* ignore */ }
+      try { token = localStorage.getItem('netgazer-token') || ''; } catch { /* ignore */ }
       if (!token || stopped) return;
 
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';

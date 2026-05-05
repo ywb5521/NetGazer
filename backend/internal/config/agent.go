@@ -26,7 +26,7 @@ type AgentConfig struct {
 func ParseAgentFlags() *AgentConfig {
 	cfg := &AgentConfig{}
 	hostname, _ := os.Hostname()
-	flag.StringVar(&cfg.ServerAddr, "server-addr", "localhost:50051", "gtopng-server gRPC address")
+	flag.StringVar(&cfg.ServerAddr, "server-addr", "localhost:50051", "netgazer-server gRPC address")
 	flag.StringVar(&cfg.Interface, "interface", "", "Network interface to capture (deprecated: use --interfaces)")
 	var ifaces string
 	flag.StringVar(&ifaces, "interfaces", "eth0", "Network interfaces to capture (comma-separated)")

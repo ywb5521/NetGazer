@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 
-const TOKEN_KEY = 'gtopng-token';
-const USER_KEY = 'gtopng-user';
+const TOKEN_KEY = 'netgazer-token';
+const USER_KEY = 'netgazer-user';
 
 interface AuthState {
   token: string | null;

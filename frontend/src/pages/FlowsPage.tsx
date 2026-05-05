@@ -45,12 +45,12 @@ function formatAppProto(raw: string): { proto: string; host?: string } {
 export default function FlowsPage() {
   const { selectedNode, selectedInterface } = useAppContext();
   const { t } = useI18n();
-  const [protocolFilter, setProtocolFilter] = useLocalStorage('gtopng-flows-protocol', 'all');
-  const [appFilter, setAppFilter] = useLocalStorage('gtopng-flows-app', 'all');
-  const [sortBy, setSortBy] = useLocalStorage('gtopng-flows-sort', 'bytes-desc');
-  const [minBytes, setMinBytes] = useLocalStorage('gtopng-flows-minbytes', '');
-  const [search, setSearch] = useLocalStorage('gtopng-flows-search', '');
-  const [activeQuick, setActiveQuick] = useLocalStorage<string | null>('gtopng-flows-quick', null);
+  const [protocolFilter, setProtocolFilter] = useLocalStorage('netgazer-flows-protocol', 'all');
+  const [appFilter, setAppFilter] = useLocalStorage('netgazer-flows-app', 'all');
+  const [sortBy, setSortBy] = useLocalStorage('netgazer-flows-sort', 'bytes-desc');
+  const [minBytes, setMinBytes] = useLocalStorage('netgazer-flows-minbytes', '');
+  const [search, setSearch] = useLocalStorage('netgazer-flows-search', '');
+  const [activeQuick, setActiveQuick] = useLocalStorage<string | null>('netgazer-flows-quick', null);
   const [selectedFlow, setSelectedFlow] = useState<Flow | null>(null);
   const [page, setPage] = useState(0);
   const [data, setData] = useState<PaginatedResponse<Flow> | null>(null);

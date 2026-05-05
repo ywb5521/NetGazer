@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"sync/atomic"
 
-	"github.com/gtopng/backend/internal/modifier"
-	"github.com/gtopng/backend/internal/ruleset"
+	"github.com/netgazer/backend/internal/modifier"
+	"github.com/netgazer/backend/internal/ruleset"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"

@@ -43,8 +43,8 @@ export default function HostsPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useLocalStorage('gtopng-hosts-search', '');
-  const [hostsTab, setHostsTab] = useLocalStorage('gtopng-hosts-tab', 'flat');
+  const [search, setSearch] = useLocalStorage('netgazer-hosts-search', '');
+  const [hostsTab, setHostsTab] = useLocalStorage('netgazer-hosts-tab', 'flat');
   const [expandedSubnet, setExpandedSubnet] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [data, setData] = useState<PaginatedResponse<Host> | null>(null);

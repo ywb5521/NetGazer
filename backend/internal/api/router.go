@@ -2,14 +2,17 @@ package api
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/gtopng/backend/internal/auth"
+	"github.com/netgazer/backend/internal/auth"
 )
 
-func NewRouter(s *Server) chi.Router {
+func NewRouter(s *Server, webDir string) chi.Router {
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
@@ -95,5 +98,33 @@ func NewRouter(s *Server) chi.Router {
 		s.Hub.HandleWebSocket(w, r)
 	})
 
+	// Serve frontend static files if webDir is configured
+	if webDir != "" {
+		fileServer = &spaFileServer{root: webDir}
+		r.NotFound(fileServer.ServeHTTP)
+	}
+
 	return r
+}
+
+var fileServer *spaFileServer
+
+type spaFileServer struct {
+	root string
+}
+
+func (s *spaFileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Don't serve static files for API/WebSocket paths (shouldn't reach here, but safety)
+	if strings.HasPrefix(r.URL.Path, "/api/") || r.URL.Path == "/ws" {
+		http.NotFound(w, r)
+		return
+	}
+
+	path := filepath.Join(s.root, filepath.Clean(r.URL.Path))
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// SPA fallback: serve index.html for client-side routing
+		http.ServeFile(w, r, filepath.Join(s.root, "index.html"))
+		return
+	}
+	http.FileServer(http.Dir(s.root)).ServeHTTP(w, r)
 }

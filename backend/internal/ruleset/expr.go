@@ -16,9 +16,9 @@ import (
 	"github.com/expr-lang/expr/vm"
 	"gopkg.in/yaml.v3"
 
-	"github.com/gtopng/backend/internal/analyzer"
-	"github.com/gtopng/backend/internal/modifier"
-	"github.com/gtopng/backend/internal/ruleset/builtins"
+	"github.com/netgazer/backend/internal/analyzer"
+	"github.com/netgazer/backend/internal/modifier"
+	"github.com/netgazer/backend/internal/ruleset/builtins"
 )
 
 // ExprRule is the external representation of an expression rule.

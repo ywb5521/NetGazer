@@ -1,4 +1,4 @@
-module github.com/gtopng/backend
+module github.com/netgazer/backend
 
 go 1.25.0
 

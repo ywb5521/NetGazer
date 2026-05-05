@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gtopng/backend/internal/models"
+	"github.com/netgazer/backend/internal/models"
 )
 
 // Config holds the collector configuration.
@@ -176,7 +176,7 @@ func (c *Collector) processSFlow(data []byte, srcIP net.IP, nodeID string) []Flo
 	return records
 }
 
-// ConvertToHosts converts flow records to gtopng Host models.
+// ConvertToHosts converts flow records to netgazer Host models.
 func ConvertToHosts(records []FlowRecord) []models.Host {
 	hostMap := make(map[string]*models.Host)
 	now := time.Now()

@@ -1,6 +1,6 @@
 package tcp
 
-import "github.com/gtopng/backend/internal/analyzer"
+import "github.com/netgazer/backend/internal/analyzer"
 
 var _ analyzer.TCPAnalyzer = (*FETAnalyzer)(nil)
 

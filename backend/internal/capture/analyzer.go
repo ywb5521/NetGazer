@@ -9,7 +9,7 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 
-	"github.com/gtopng/backend/internal/ndpi"
+	"github.com/netgazer/backend/internal/ndpi"
 )
 
 type ParsedPacket struct {

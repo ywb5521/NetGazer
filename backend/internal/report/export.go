@@ -7,8 +7,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/gtopng/backend/internal/models"
-	"github.com/gtopng/backend/internal/storage"
+	"github.com/netgazer/backend/internal/models"
+	"github.com/netgazer/backend/internal/storage"
 )
 
 // ExportFormat represents a supported export format.
@@ -124,7 +124,7 @@ func writeSnapshotNDJSON(w io.Writer, snaps []models.TrafficSnapshot) error {
 		// ES bulk format: action line + document line
 		action := map[string]interface{}{
 			"index": map[string]interface{}{
-				"_index": "gtopng-traffic",
+				"_index": "netgazer-traffic",
 				"_id":    fmt.Sprintf("%s-%d", s.NodeID, s.Timestamp.UnixMilli()),
 			},
 		}
@@ -176,7 +176,7 @@ func writeHostNDJSON(w io.Writer, hosts []models.HostSnapshot) error {
 	for _, h := range hosts {
 		action := map[string]interface{}{
 			"index": map[string]interface{}{
-				"_index": "gtopng-hosts",
+				"_index": "netgazer-hosts",
 				"_id":    fmt.Sprintf("%s-%s-%d", h.NodeID, h.HostIP, h.Timestamp.UnixMilli()),
 			},
 		}
@@ -228,7 +228,7 @@ func writeAlertNDJSON(w io.Writer, alerts []models.Alert) error {
 	for _, a := range alerts {
 		action := map[string]interface{}{
 			"index": map[string]interface{}{
-				"_index": "gtopng-alerts",
+				"_index": "netgazer-alerts",
 				"_id":    a.ID,
 			},
 		}

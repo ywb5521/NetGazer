@@ -1,6 +1,6 @@
 syntax = "proto3";
-package gtopng.v1;
-option go_package = "github.com/gtopng/backend/gen/gtopng/v1;gtopngv1";
+package netgazer.v1;
+option go_package = "github.com/netgazer/backend/gen/netgazer/v1;netgazerv1";
 
 service AgentService {
   rpc Register(RegisterRequest) returns (RegisterResponse);

@@ -7,7 +7,7 @@ type Lang = 'zh' | 'en';
 
 const translations: Record<Lang, Translations> = { zh, en };
 
-const LANG_KEY = 'gtopng-lang';
+const LANG_KEY = 'netgazer-lang';
 
 function getInitialLang(): Lang {
   try {

@@ -454,7 +454,7 @@ export interface Translations {
 }
 
 export const zh: Translations = {
-  app: { title: 'gtopng - 网络流量监控' },
+  app: { title: 'netgazer - 网络流量监控' },
   nav: {
     dashboard: '仪表盘',
     hosts: '主机',
@@ -627,7 +627,7 @@ export const zh: Translations = {
     version: '版本',
     tags: '标签',
     lastSeen: '最近活跃',
-    startAgent: '启动 gtopng-agent 以开始监控',
+    startAgent: '启动 netgazer-agent 以开始监控',
     systemHealth: '系统健康',
     diskFree: '磁盘可用',
     uptime: '运行时间',
@@ -826,7 +826,7 @@ export const zh: Translations = {
     allRules: '全部规则',
   },
   auth: {
-    loginTitle: 'gtopng',
+    loginTitle: 'netgazer',
     loginPrompt: '请输入管理员密码',
     loginButton: '登录',
     passwordPlaceholder: '密码',

@@ -2,7 +2,7 @@ const BASE = `${import.meta.env.BASE_URL}api`;
 
 function getToken(): string | null {
   try {
-    return localStorage.getItem('gtopng-token');
+    return localStorage.getItem('netgazer-token');
   } catch {
     return null;
   }
@@ -28,14 +28,14 @@ async function authFetch(url: string, options?: RequestInit): Promise<Response> 
   }
   const res = await fetch(url, { ...options, headers });
   if (res.status === 401) {
-    try { localStorage.removeItem('gtopng-token'); } catch { /* ignore */ }
+    try { localStorage.removeItem('netgazer-token'); } catch { /* ignore */ }
   }
   return res;
 }
 
 function handleAuthError(status: number) {
   if (status === 401) {
-    try { localStorage.removeItem('gtopng-token'); } catch { /* ignore */ }
+    try { localStorage.removeItem('netgazer-token'); } catch { /* ignore */ }
   }
 }
 
@@ -445,7 +445,7 @@ export async function downloadExport(type: 'snapshots' | 'hosts' | 'alerts', for
   const downloadUrl = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = downloadUrl;
-  a.download = `gtopng-${type}.${ext}`;
+  a.download = `netgazer-${type}.${ext}`;
   a.click();
   URL.revokeObjectURL(downloadUrl);
 }

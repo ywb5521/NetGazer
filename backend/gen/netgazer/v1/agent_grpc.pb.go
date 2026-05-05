@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v3.21.12
-// source: gtopng/v1/agent.proto
+// source: netgazer/v1/agent.proto
 
-package gtopngv1
+package netgazerv1
 
 import (
 	context "context"
@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	AgentService_Register_FullMethodName        = "/gtopng.v1.AgentService/Register"
-	AgentService_StreamSnapshots_FullMethodName = "/gtopng.v1.AgentService/StreamSnapshots"
+	AgentService_Register_FullMethodName        = "/netgazer.v1.AgentService/Register"
+	AgentService_StreamSnapshots_FullMethodName = "/netgazer.v1.AgentService/StreamSnapshots"
 )
 
 // AgentServiceClient is the client API for AgentService service.
@@ -134,7 +134,7 @@ type AgentService_StreamSnapshotsServer = grpc.BidiStreamingServer[AgentMessage,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AgentService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "gtopng.v1.AgentService",
+	ServiceName: "netgazer.v1.AgentService",
 	HandlerType: (*AgentServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -150,5 +150,5 @@ var AgentService_ServiceDesc = grpc.ServiceDesc{
 			ClientStreams: true,
 		},
 	},
-	Metadata: "gtopng/v1/agent.proto",
+	Metadata: "netgazer/v1/agent.proto",
 }

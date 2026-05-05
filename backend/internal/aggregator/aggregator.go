@@ -8,10 +8,10 @@ import (
 	"sync"
 	"time"
 
-	gtopngv1 "github.com/gtopng/backend/gen/gtopng/v1"
-	"github.com/gtopng/backend/internal/geoip"
-	"github.com/gtopng/backend/internal/models"
-	"github.com/gtopng/backend/internal/tracker"
+	netgazerv1 "github.com/netgazer/backend/gen/netgazer/v1"
+	"github.com/netgazer/backend/internal/geoip"
+	"github.com/netgazer/backend/internal/models"
+	"github.com/netgazer/backend/internal/tracker"
 )
 
 type ifaceState struct {
@@ -57,7 +57,7 @@ func (ns *nodeState) getOrCreateIface(name string) *ifaceState {
 	return is
 }
 
-func (is *ifaceState) UpdateFrom(nodeID string, msg *gtopngv1.AgentMessage) {
+func (is *ifaceState) UpdateFrom(nodeID string, msg *netgazerv1.AgentMessage) {
 	is.Snapshot = models.TrafficSnapshot{
 		Timestamp:     time.UnixMilli(msg.TimestampUnixMs),
 		BytesPerSec:   msg.Snapshot.BytesPerSec,
@@ -296,7 +296,7 @@ func (a *Aggregator) SetNodeOffline(nodeID string) {
 	}
 }
 
-func (a *Aggregator) Ingest(msg *gtopngv1.AgentMessage) {
+func (a *Aggregator) Ingest(msg *netgazerv1.AgentMessage) {
 	iface := msg.Interface
 
 	a.mu.Lock()

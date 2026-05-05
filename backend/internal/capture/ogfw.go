@@ -6,9 +6,9 @@ import (
 	"net"
 	"sync"
 
-	"github.com/gtopng/backend/internal/analyzer"
-	"github.com/gtopng/backend/internal/analyzer/tcp"
-	"github.com/gtopng/backend/internal/analyzer/udp"
+	"github.com/netgazer/backend/internal/analyzer"
+	"github.com/netgazer/backend/internal/analyzer/tcp"
+	"github.com/netgazer/backend/internal/analyzer/udp"
 )
 
 // defaultLogger implements analyzer.Logger using the standard log package.

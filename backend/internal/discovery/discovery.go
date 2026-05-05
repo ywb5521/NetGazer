@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gtopng/backend/internal/aggregator"
-	"github.com/gtopng/backend/internal/models"
+	"github.com/netgazer/backend/internal/aggregator"
+	"github.com/netgazer/backend/internal/models"
 )
 
 // DiscoveredHost represents a host found during network discovery.

@@ -4,8 +4,8 @@ import (
 	"net"
 	"sync"
 
-	"github.com/gtopng/backend/internal/analyzer"
-	"github.com/gtopng/backend/internal/ruleset"
+	"github.com/netgazer/backend/internal/analyzer"
+	"github.com/netgazer/backend/internal/ruleset"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/google/gopacket"

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net"
 
-	"github.com/gtopng/backend/internal/modifier"
+	"github.com/netgazer/backend/internal/modifier"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"

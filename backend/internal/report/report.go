@@ -3,8 +3,8 @@ package report
 import (
 	"time"
 
-	"github.com/gtopng/backend/internal/models"
-	"github.com/gtopng/backend/internal/storage"
+	"github.com/netgazer/backend/internal/models"
+	"github.com/netgazer/backend/internal/storage"
 )
 
 // Generator produces historical reports from stored data.

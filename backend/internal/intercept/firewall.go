@@ -13,7 +13,7 @@ const (
 	nfqueueConnMarkDrop   = 1002
 
 	nftFamily = "inet"
-	nftTable  = "gtopng"
+	nftTable  = "netgazer"
 )
 
 type nftTableSpec struct {

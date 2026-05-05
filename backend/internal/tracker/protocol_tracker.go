@@ -3,8 +3,8 @@ package tracker
 import (
 	"sync"
 
-	"github.com/gtopng/backend/internal/capture"
-	"github.com/gtopng/backend/internal/models"
+	"github.com/netgazer/backend/internal/capture"
+	"github.com/netgazer/backend/internal/models"
 )
 
 type ProtocolTracker struct {

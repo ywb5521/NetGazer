@@ -34,7 +34,7 @@ export default function SettingsPage() {
             <dl className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">{t.settings.version}</dt>
-                <dd>gtopng 0.1.0</dd>
+                <dd>netgazer 0.1.0</dd>
               </div>
               <div className="flex justify-between">
                 <dt className="text-muted-foreground">{t.settings.frontend}</dt>

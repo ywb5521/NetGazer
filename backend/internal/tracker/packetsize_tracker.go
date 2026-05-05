@@ -3,7 +3,7 @@ package tracker
 import (
 	"sync"
 
-	"github.com/gtopng/backend/internal/capture"
+	"github.com/netgazer/backend/internal/capture"
 )
 
 type PacketSizeDist struct {

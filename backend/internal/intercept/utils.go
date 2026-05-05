@@ -1,6 +1,6 @@
 package intercept
 
-import "github.com/gtopng/backend/internal/analyzer"
+import "github.com/netgazer/backend/internal/analyzer"
 
 var _ analyzer.Logger = (*analyzerLogger)(nil)
 

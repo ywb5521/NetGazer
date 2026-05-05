@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/gtopng/backend/internal/capture"
-	"github.com/gtopng/backend/internal/models"
+	"github.com/netgazer/backend/internal/capture"
+	"github.com/netgazer/backend/internal/models"
 )
 
 type FlowTracker struct {

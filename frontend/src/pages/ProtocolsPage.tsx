@@ -28,7 +28,7 @@ const COLORS = [
 export default function ProtocolsPage() {
   const { selectedNode, selectedInterface } = useAppContext();
   const { t } = useI18n();
-  const [protoTab, setProtoTab] = useLocalStorage('gtopng-protocols-tab', 'chart');
+  const [protoTab, setProtoTab] = useLocalStorage('netgazer-protocols-tab', 'chart');
   const [data, setData] = useState<PaginatedResponse<import('@/types').ProtocolStat> | null>(null);
   const [loading, setLoading] = useState(false);
 

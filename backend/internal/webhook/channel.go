@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gtopng/backend/internal/models"
+	"github.com/netgazer/backend/internal/models"
 )
 
 type ChannelSender interface {
@@ -30,7 +30,7 @@ func (s *GenericWebhookSender) Send(alert models.Alert) error {
 	payload := map[string]interface{}{
 		"alert":     alert.ToJSON(),
 		"timestamp": time.Now().UTC().Format(time.RFC3339),
-		"source":    "gtopng",
+		"source":    "netgazer",
 	}
 	body, _ := json.Marshal(payload)
 	resp, err := s.client.Post(s.url, "application/json", bytes.NewReader(body))
@@ -97,7 +97,7 @@ type DingTalkSender struct {
 func (s *DingTalkSender) Type() models.NotificationChannelType { return models.ChannelDingTalk }
 
 func (s *DingTalkSender) Send(alert models.Alert) error {
-	title := fmt.Sprintf("gtopng Alert: %s", alert.Type)
+	title := fmt.Sprintf("netgazer Alert: %s", alert.Type)
 	text := fmt.Sprintf("## %s\n\n**Type:** %s\n**Severity:** %s\n**Source:** %s\n**Node:** %s\n**Time:** %s\n\n%s",
 		title, alert.Type, alert.Severity, alert.SourceIP,
 		alert.NodeID, alert.Timestamp.Format(time.RFC3339), alert.Message)
@@ -143,7 +143,7 @@ func (s *FeishuSender) Send(alert models.Alert) error {
 			"header": map[string]interface{}{
 				"title": map[string]string{
 					"tag":     "plain_text",
-					"content": fmt.Sprintf("gtopng: %s", alert.Type),
+					"content": fmt.Sprintf("netgazer: %s", alert.Type),
 				},
 				"template": color,
 			},
@@ -183,7 +183,7 @@ type EmailSender struct {
 func (s *EmailSender) Type() models.NotificationChannelType { return models.ChannelEmail }
 
 func (s *EmailSender) Send(alert models.Alert) error {
-	subject := fmt.Sprintf("gtopng [%s] %s - %s", alert.Severity, alert.Type, alert.SourceIP)
+	subject := fmt.Sprintf("netgazer [%s] %s - %s", alert.Severity, alert.Type, alert.SourceIP)
 	body := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nType: %s\nSeverity: %s\nMessage: %s\nSource IP: %s\nNode: %s\nTime: %s\n",
 		s.cfg.From, strings.Join(s.cfg.To, ", "), subject,
 		alert.Type, alert.Severity, alert.Message, alert.SourceIP,
@@ -320,7 +320,7 @@ func SendTest(ch models.NotificationChannel) error {
 		ID:        "test-" + time.Now().Format("150405"),
 		Type:      models.AlertType("test"),
 		Severity:  models.SeverityInfo,
-		Message:   "gtopng test notification",
+		Message:   "netgazer test notification",
 		SourceIP:  "127.0.0.1",
 		NodeID:    "test",
 		Timestamp: time.Now(),

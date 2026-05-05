@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gtopng/backend/internal/models"
+	"github.com/netgazer/backend/internal/models"
 	_ "modernc.org/sqlite"
 )
 

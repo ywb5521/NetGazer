@@ -1,7 +1,7 @@
 import type { Translations } from './translations';
 
 export const en: Translations = {
-  app: { title: 'gtopng - Network Traffic Monitor' },
+  app: { title: 'netgazer - Network Traffic Monitor' },
   nav: {
     dashboard: 'Dashboard',
     hosts: 'Hosts',
@@ -174,7 +174,7 @@ export const en: Translations = {
     version: 'Version',
     tags: 'Tags',
     lastSeen: 'Last Seen',
-    startAgent: 'Start a gtopng-agent to begin monitoring',
+    startAgent: 'Start a netgazer-agent to begin monitoring',
     systemHealth: 'System Health',
     diskFree: 'Disk free:',
     uptime: 'Uptime:',
@@ -373,7 +373,7 @@ export const en: Translations = {
     allRules: 'All Rules',
   },
   auth: {
-    loginTitle: 'gtopng',
+    loginTitle: 'netgazer',
     loginPrompt: 'Enter the admin password',
     loginButton: 'Login',
     passwordPlaceholder: 'Password',

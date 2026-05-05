@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v3.21.12
-// source: gtopng/v1/agent.proto
+// source: netgazer/v1/agent.proto
 
-package gtopngv1
+package netgazerv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -35,7 +35,7 @@ type RegisterRequest struct {
 
 func (x *RegisterRequest) Reset() {
 	*x = RegisterRequest{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[0]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +47,7 @@ func (x *RegisterRequest) String() string {
 func (*RegisterRequest) ProtoMessage() {}
 
 func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[0]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
 func (*RegisterRequest) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{0}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *RegisterRequest) GetNodeId() string {
@@ -116,7 +116,7 @@ type RegisterResponse struct {
 
 func (x *RegisterResponse) Reset() {
 	*x = RegisterResponse{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[1]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -128,7 +128,7 @@ func (x *RegisterResponse) String() string {
 func (*RegisterResponse) ProtoMessage() {}
 
 func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[1]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -141,7 +141,7 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
 func (*RegisterResponse) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{1}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RegisterResponse) GetAccepted() bool {
@@ -185,7 +185,7 @@ type AgentMessage struct {
 
 func (x *AgentMessage) Reset() {
 	*x = AgentMessage{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[2]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -197,7 +197,7 @@ func (x *AgentMessage) String() string {
 func (*AgentMessage) ProtoMessage() {}
 
 func (x *AgentMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[2]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -210,7 +210,7 @@ func (x *AgentMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentMessage.ProtoReflect.Descriptor instead.
 func (*AgentMessage) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{2}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *AgentMessage) GetNodeId() string {
@@ -312,7 +312,7 @@ type SystemHealth struct {
 
 func (x *SystemHealth) Reset() {
 	*x = SystemHealth{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[3]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -324,7 +324,7 @@ func (x *SystemHealth) String() string {
 func (*SystemHealth) ProtoMessage() {}
 
 func (x *SystemHealth) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[3]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -337,7 +337,7 @@ func (x *SystemHealth) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SystemHealth.ProtoReflect.Descriptor instead.
 func (*SystemHealth) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{3}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SystemHealth) GetCpuPercent() float64 {
@@ -401,7 +401,7 @@ type DNSQuery struct {
 
 func (x *DNSQuery) Reset() {
 	*x = DNSQuery{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[4]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -413,7 +413,7 @@ func (x *DNSQuery) String() string {
 func (*DNSQuery) ProtoMessage() {}
 
 func (x *DNSQuery) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[4]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -426,7 +426,7 @@ func (x *DNSQuery) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DNSQuery.ProtoReflect.Descriptor instead.
 func (*DNSQuery) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{4}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DNSQuery) GetQueryName() string {
@@ -472,7 +472,7 @@ type PacketSizeDist struct {
 
 func (x *PacketSizeDist) Reset() {
 	*x = PacketSizeDist{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[5]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -484,7 +484,7 @@ func (x *PacketSizeDist) String() string {
 func (*PacketSizeDist) ProtoMessage() {}
 
 func (x *PacketSizeDist) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[5]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -497,7 +497,7 @@ func (x *PacketSizeDist) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PacketSizeDist.ProtoReflect.Descriptor instead.
 func (*PacketSizeDist) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{5}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *PacketSizeDist) GetSize_64() uint64 {
@@ -563,7 +563,7 @@ type ServerMessage struct {
 
 func (x *ServerMessage) Reset() {
 	*x = ServerMessage{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[6]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -575,7 +575,7 @@ func (x *ServerMessage) String() string {
 func (*ServerMessage) ProtoMessage() {}
 
 func (x *ServerMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[6]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -588,7 +588,7 @@ func (x *ServerMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServerMessage.ProtoReflect.Descriptor instead.
 func (*ServerMessage) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{6}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ServerMessage) GetMessage() isServerMessage_Message {
@@ -656,7 +656,7 @@ type Ack struct {
 
 func (x *Ack) Reset() {
 	*x = Ack{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[7]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -668,7 +668,7 @@ func (x *Ack) String() string {
 func (*Ack) ProtoMessage() {}
 
 func (x *Ack) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[7]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -681,7 +681,7 @@ func (x *Ack) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ack.ProtoReflect.Descriptor instead.
 func (*Ack) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{7}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *Ack) GetReceivedTimestampUnixMs() int64 {
@@ -701,7 +701,7 @@ type ConfigUpdate struct {
 
 func (x *ConfigUpdate) Reset() {
 	*x = ConfigUpdate{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[8]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -713,7 +713,7 @@ func (x *ConfigUpdate) String() string {
 func (*ConfigUpdate) ProtoMessage() {}
 
 func (x *ConfigUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[8]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -726,7 +726,7 @@ func (x *ConfigUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigUpdate.ProtoReflect.Descriptor instead.
 func (*ConfigUpdate) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{8}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ConfigUpdate) GetNewSnapshotIntervalMs() int32 {
@@ -754,7 +754,7 @@ type TrafficSnapshot struct {
 
 func (x *TrafficSnapshot) Reset() {
 	*x = TrafficSnapshot{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[9]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -766,7 +766,7 @@ func (x *TrafficSnapshot) String() string {
 func (*TrafficSnapshot) ProtoMessage() {}
 
 func (x *TrafficSnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[9]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -779,7 +779,7 @@ func (x *TrafficSnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrafficSnapshot.ProtoReflect.Descriptor instead.
 func (*TrafficSnapshot) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{9}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *TrafficSnapshot) GetBytesPerSec() float64 {
@@ -822,7 +822,7 @@ type Host struct {
 
 func (x *Host) Reset() {
 	*x = Host{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[10]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -834,7 +834,7 @@ func (x *Host) String() string {
 func (*Host) ProtoMessage() {}
 
 func (x *Host) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[10]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -847,7 +847,7 @@ func (x *Host) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Host.ProtoReflect.Descriptor instead.
 func (*Host) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{10}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Host) GetIp() string {
@@ -947,7 +947,7 @@ type Flow struct {
 
 func (x *Flow) Reset() {
 	*x = Flow{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[11]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -959,7 +959,7 @@ func (x *Flow) String() string {
 func (*Flow) ProtoMessage() {}
 
 func (x *Flow) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[11]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -972,7 +972,7 @@ func (x *Flow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Flow.ProtoReflect.Descriptor instead.
 func (*Flow) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{11}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *Flow) GetId() string {
@@ -1079,7 +1079,7 @@ type TCPMetrics struct {
 
 func (x *TCPMetrics) Reset() {
 	*x = TCPMetrics{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[12]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1091,7 +1091,7 @@ func (x *TCPMetrics) String() string {
 func (*TCPMetrics) ProtoMessage() {}
 
 func (x *TCPMetrics) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[12]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1104,7 +1104,7 @@ func (x *TCPMetrics) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TCPMetrics.ProtoReflect.Descriptor instead.
 func (*TCPMetrics) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{12}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *TCPMetrics) GetActiveTcpFlows() int32 {
@@ -1203,7 +1203,7 @@ type LatencyStats struct {
 
 func (x *LatencyStats) Reset() {
 	*x = LatencyStats{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[13]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1215,7 +1215,7 @@ func (x *LatencyStats) String() string {
 func (*LatencyStats) ProtoMessage() {}
 
 func (x *LatencyStats) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[13]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1228,7 +1228,7 @@ func (x *LatencyStats) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LatencyStats.ProtoReflect.Descriptor instead.
 func (*LatencyStats) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{13}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *LatencyStats) GetSamples() int32 {
@@ -1270,7 +1270,7 @@ type LatencySnapshot struct {
 
 func (x *LatencySnapshot) Reset() {
 	*x = LatencySnapshot{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[14]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1282,7 +1282,7 @@ func (x *LatencySnapshot) String() string {
 func (*LatencySnapshot) ProtoMessage() {}
 
 func (x *LatencySnapshot) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[14]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1295,7 +1295,7 @@ func (x *LatencySnapshot) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LatencySnapshot.ProtoReflect.Descriptor instead.
 func (*LatencySnapshot) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{14}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *LatencySnapshot) GetDnsLatency() *LatencyStats {
@@ -1331,7 +1331,7 @@ type ProtocolStat struct {
 
 func (x *ProtocolStat) Reset() {
 	*x = ProtocolStat{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[15]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1343,7 +1343,7 @@ func (x *ProtocolStat) String() string {
 func (*ProtocolStat) ProtoMessage() {}
 
 func (x *ProtocolStat) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[15]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1356,7 +1356,7 @@ func (x *ProtocolStat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProtocolStat.ProtoReflect.Descriptor instead.
 func (*ProtocolStat) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{15}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ProtocolStat) GetProtocol() string {
@@ -1400,7 +1400,7 @@ type InterceptRule struct {
 
 func (x *InterceptRule) Reset() {
 	*x = InterceptRule{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[16]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1412,7 +1412,7 @@ func (x *InterceptRule) String() string {
 func (*InterceptRule) ProtoMessage() {}
 
 func (x *InterceptRule) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[16]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1425,7 +1425,7 @@ func (x *InterceptRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterceptRule.ProtoReflect.Descriptor instead.
 func (*InterceptRule) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{16}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *InterceptRule) GetId() string {
@@ -1473,7 +1473,7 @@ type InterceptConfigUpdate struct {
 
 func (x *InterceptConfigUpdate) Reset() {
 	*x = InterceptConfigUpdate{}
-	mi := &file_gtopng_v1_agent_proto_msgTypes[17]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1485,7 +1485,7 @@ func (x *InterceptConfigUpdate) String() string {
 func (*InterceptConfigUpdate) ProtoMessage() {}
 
 func (x *InterceptConfigUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_gtopng_v1_agent_proto_msgTypes[17]
+	mi := &file_netgazer_v1_agent_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1498,7 +1498,7 @@ func (x *InterceptConfigUpdate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterceptConfigUpdate.ProtoReflect.Descriptor instead.
 func (*InterceptConfigUpdate) Descriptor() ([]byte, []int) {
-	return file_gtopng_v1_agent_proto_rawDescGZIP(), []int{17}
+	return file_netgazer_v1_agent_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *InterceptConfigUpdate) GetTargetNodes() []string {
@@ -1515,11 +1515,11 @@ func (x *InterceptConfigUpdate) GetRules() []*InterceptRule {
 	return nil
 }
 
-var File_gtopng_v1_agent_proto protoreflect.FileDescriptor
+var File_netgazer_v1_agent_proto protoreflect.FileDescriptor
 
-const file_gtopng_v1_agent_proto_rawDesc = "" +
+const file_netgazer_v1_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x15gtopng/v1/agent.proto\x12\tgtopng.v1\"\xb5\x01\n" +
+	"\x15netgazer/v1/agent.proto\x12\tnetgazer.v1\"\xb5\x01\n" +
 	"\x0fRegisterRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x1c\n" +
 	"\tinterface\x18\x02 \x01(\tR\tinterface\x12\x18\n" +
@@ -1537,19 +1537,19 @@ const file_gtopng_v1_agent_proto_rawDesc = "" +
 	"\fAgentMessage\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12*\n" +
 	"\x11timestamp_unix_ms\x18\x02 \x01(\x03R\x0ftimestampUnixMs\x126\n" +
-	"\bsnapshot\x18\x03 \x01(\v2\x1a.gtopng.v1.TrafficSnapshotR\bsnapshot\x12%\n" +
-	"\x05hosts\x18\x04 \x03(\v2\x0f.gtopng.v1.HostR\x05hosts\x12%\n" +
-	"\x05flows\x18\x05 \x03(\v2\x0f.gtopng.v1.FlowR\x05flows\x125\n" +
-	"\tprotocols\x18\x06 \x03(\v2\x17.gtopng.v1.ProtocolStatR\tprotocols\x124\n" +
-	"\vdns_queries\x18\a \x03(\v2\x13.gtopng.v1.DNSQueryR\n" +
+	"\bsnapshot\x18\x03 \x01(\v2\x1a.netgazer.v1.TrafficSnapshotR\bsnapshot\x12%\n" +
+	"\x05hosts\x18\x04 \x03(\v2\x0f.netgazer.v1.HostR\x05hosts\x12%\n" +
+	"\x05flows\x18\x05 \x03(\v2\x0f.netgazer.v1.FlowR\x05flows\x125\n" +
+	"\tprotocols\x18\x06 \x03(\v2\x17.netgazer.v1.ProtocolStatR\tprotocols\x124\n" +
+	"\vdns_queries\x18\a \x03(\v2\x13.netgazer.v1.DNSQueryR\n" +
 	"dnsQueries\x12C\n" +
-	"\x10packet_size_dist\x18\b \x01(\v2\x19.gtopng.v1.PacketSizeDistR\x0epacketSizeDist\x12<\n" +
-	"\rsystem_health\x18\t \x01(\v2\x17.gtopng.v1.SystemHealthR\fsystemHealth\x12\x1c\n" +
+	"\x10packet_size_dist\x18\b \x01(\v2\x19.netgazer.v1.PacketSizeDistR\x0epacketSizeDist\x12<\n" +
+	"\rsystem_health\x18\t \x01(\v2\x17.netgazer.v1.SystemHealthR\fsystemHealth\x12\x1c\n" +
 	"\tinterface\x18\n" +
 	" \x01(\tR\tinterface\x126\n" +
-	"\vtcp_metrics\x18\v \x01(\v2\x15.gtopng.v1.TCPMetricsR\n" +
+	"\vtcp_metrics\x18\v \x01(\v2\x15.netgazer.v1.TCPMetricsR\n" +
 	"tcpMetrics\x124\n" +
-	"\alatency\x18\f \x01(\v2\x1a.gtopng.v1.LatencySnapshotR\alatency\"\x97\x02\n" +
+	"\alatency\x18\f \x01(\v2\x1a.netgazer.v1.LatencySnapshotR\alatency\"\x97\x02\n" +
 	"\fSystemHealth\x12\x1f\n" +
 	"\vcpu_percent\x18\x01 \x01(\x01R\n" +
 	"cpuPercent\x12\x1f\n" +
@@ -1577,9 +1577,9 @@ const file_gtopng_v1_agent_proto_rawDesc = "" +
 	"\vsize_gt1500\x18\a \x01(\x04R\n" +
 	"sizeGt1500\"\xcd\x01\n" +
 	"\rServerMessage\x12\"\n" +
-	"\x03ack\x18\x01 \x01(\v2\x0e.gtopng.v1.AckH\x00R\x03ack\x12>\n" +
-	"\rconfig_update\x18\x02 \x01(\v2\x17.gtopng.v1.ConfigUpdateH\x00R\fconfigUpdate\x12M\n" +
-	"\x10intercept_update\x18\x03 \x01(\v2 .gtopng.v1.InterceptConfigUpdateH\x00R\x0finterceptUpdateB\t\n" +
+	"\x03ack\x18\x01 \x01(\v2\x0e.netgazer.v1.AckH\x00R\x03ack\x12>\n" +
+	"\rconfig_update\x18\x02 \x01(\v2\x17.netgazer.v1.ConfigUpdateH\x00R\fconfigUpdate\x12M\n" +
+	"\x10intercept_update\x18\x03 \x01(\v2 .netgazer.v1.InterceptConfigUpdateH\x00R\x0finterceptUpdateB\t\n" +
 	"\amessage\"B\n" +
 	"\x03Ack\x12;\n" +
 	"\x1areceived_timestamp_unix_ms\x18\x01 \x01(\x03R\x17receivedTimestampUnixMs\"f\n" +
@@ -1646,11 +1646,11 @@ const file_gtopng_v1_agent_proto_rawDesc = "" +
 	"\x06min_ms\x18\x03 \x01(\x01R\x05minMs\x12\x15\n" +
 	"\x06max_ms\x18\x04 \x01(\x01R\x05maxMs\"\xbf\x01\n" +
 	"\x0fLatencySnapshot\x128\n" +
-	"\vdns_latency\x18\x01 \x01(\v2\x17.gtopng.v1.LatencyStatsR\n" +
+	"\vdns_latency\x18\x01 \x01(\v2\x17.netgazer.v1.LatencyStatsR\n" +
 	"dnsLatency\x128\n" +
-	"\vtls_latency\x18\x02 \x01(\v2\x17.gtopng.v1.LatencyStatsR\n" +
+	"\vtls_latency\x18\x02 \x01(\v2\x17.netgazer.v1.LatencyStatsR\n" +
 	"tlsLatency\x128\n" +
-	"\vtcp_latency\x18\x03 \x01(\v2\x17.gtopng.v1.LatencyStatsR\n" +
+	"\vtcp_latency\x18\x03 \x01(\v2\x17.netgazer.v1.LatencyStatsR\n" +
 	"tcpLatency\"z\n" +
 	"\fProtocolStat\x12\x1a\n" +
 	"\bprotocol\x18\x01 \x01(\tR\bprotocol\x12\x14\n" +
@@ -1669,65 +1669,65 @@ const file_gtopng_v1_agent_proto_rawDesc = "" +
 	"\aenabled\x18\x05 \x01(\bR\aenabled\"j\n" +
 	"\x15InterceptConfigUpdate\x12!\n" +
 	"\ftarget_nodes\x18\x01 \x03(\tR\vtargetNodes\x12.\n" +
-	"\x05rules\x18\x02 \x03(\v2\x18.gtopng.v1.InterceptRuleR\x05rules2\x9d\x01\n" +
+	"\x05rules\x18\x02 \x03(\v2\x18.netgazer.v1.InterceptRuleR\x05rules2\x9d\x01\n" +
 	"\fAgentService\x12C\n" +
-	"\bRegister\x12\x1a.gtopng.v1.RegisterRequest\x1a\x1b.gtopng.v1.RegisterResponse\x12H\n" +
-	"\x0fStreamSnapshots\x12\x17.gtopng.v1.AgentMessage\x1a\x18.gtopng.v1.ServerMessage(\x010\x01B2Z0github.com/gtopng/backend/gen/gtopng/v1;gtopngv1b\x06proto3"
+	"\bRegister\x12\x1a.netgazer.v1.RegisterRequest\x1a\x1b.netgazer.v1.RegisterResponse\x12H\n" +
+	"\x0fStreamSnapshots\x12\x17.netgazer.v1.AgentMessage\x1a\x18.netgazer.v1.ServerMessage(\x010\x01B2Z0github.com/netgazer/backend/gen/netgazer/v1;netgazerv1b\x06proto3"
 
 var (
-	file_gtopng_v1_agent_proto_rawDescOnce sync.Once
-	file_gtopng_v1_agent_proto_rawDescData []byte
+	file_netgazer_v1_agent_proto_rawDescOnce sync.Once
+	file_netgazer_v1_agent_proto_rawDescData []byte
 )
 
-func file_gtopng_v1_agent_proto_rawDescGZIP() []byte {
-	file_gtopng_v1_agent_proto_rawDescOnce.Do(func() {
-		file_gtopng_v1_agent_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_gtopng_v1_agent_proto_rawDesc), len(file_gtopng_v1_agent_proto_rawDesc)))
+func file_netgazer_v1_agent_proto_rawDescGZIP() []byte {
+	file_netgazer_v1_agent_proto_rawDescOnce.Do(func() {
+		file_netgazer_v1_agent_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_netgazer_v1_agent_proto_rawDesc), len(file_netgazer_v1_agent_proto_rawDesc)))
 	})
-	return file_gtopng_v1_agent_proto_rawDescData
+	return file_netgazer_v1_agent_proto_rawDescData
 }
 
-var file_gtopng_v1_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
-var file_gtopng_v1_agent_proto_goTypes = []any{
-	(*RegisterRequest)(nil),       // 0: gtopng.v1.RegisterRequest
-	(*RegisterResponse)(nil),      // 1: gtopng.v1.RegisterResponse
-	(*AgentMessage)(nil),          // 2: gtopng.v1.AgentMessage
-	(*SystemHealth)(nil),          // 3: gtopng.v1.SystemHealth
-	(*DNSQuery)(nil),              // 4: gtopng.v1.DNSQuery
-	(*PacketSizeDist)(nil),        // 5: gtopng.v1.PacketSizeDist
-	(*ServerMessage)(nil),         // 6: gtopng.v1.ServerMessage
-	(*Ack)(nil),                   // 7: gtopng.v1.Ack
-	(*ConfigUpdate)(nil),          // 8: gtopng.v1.ConfigUpdate
-	(*TrafficSnapshot)(nil),       // 9: gtopng.v1.TrafficSnapshot
-	(*Host)(nil),                  // 10: gtopng.v1.Host
-	(*Flow)(nil),                  // 11: gtopng.v1.Flow
-	(*TCPMetrics)(nil),            // 12: gtopng.v1.TCPMetrics
-	(*LatencyStats)(nil),          // 13: gtopng.v1.LatencyStats
-	(*LatencySnapshot)(nil),       // 14: gtopng.v1.LatencySnapshot
-	(*ProtocolStat)(nil),          // 15: gtopng.v1.ProtocolStat
-	(*InterceptRule)(nil),         // 16: gtopng.v1.InterceptRule
-	(*InterceptConfigUpdate)(nil), // 17: gtopng.v1.InterceptConfigUpdate
+var file_netgazer_v1_agent_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_netgazer_v1_agent_proto_goTypes = []any{
+	(*RegisterRequest)(nil),       // 0: netgazer.v1.RegisterRequest
+	(*RegisterResponse)(nil),      // 1: netgazer.v1.RegisterResponse
+	(*AgentMessage)(nil),          // 2: netgazer.v1.AgentMessage
+	(*SystemHealth)(nil),          // 3: netgazer.v1.SystemHealth
+	(*DNSQuery)(nil),              // 4: netgazer.v1.DNSQuery
+	(*PacketSizeDist)(nil),        // 5: netgazer.v1.PacketSizeDist
+	(*ServerMessage)(nil),         // 6: netgazer.v1.ServerMessage
+	(*Ack)(nil),                   // 7: netgazer.v1.Ack
+	(*ConfigUpdate)(nil),          // 8: netgazer.v1.ConfigUpdate
+	(*TrafficSnapshot)(nil),       // 9: netgazer.v1.TrafficSnapshot
+	(*Host)(nil),                  // 10: netgazer.v1.Host
+	(*Flow)(nil),                  // 11: netgazer.v1.Flow
+	(*TCPMetrics)(nil),            // 12: netgazer.v1.TCPMetrics
+	(*LatencyStats)(nil),          // 13: netgazer.v1.LatencyStats
+	(*LatencySnapshot)(nil),       // 14: netgazer.v1.LatencySnapshot
+	(*ProtocolStat)(nil),          // 15: netgazer.v1.ProtocolStat
+	(*InterceptRule)(nil),         // 16: netgazer.v1.InterceptRule
+	(*InterceptConfigUpdate)(nil), // 17: netgazer.v1.InterceptConfigUpdate
 }
-var file_gtopng_v1_agent_proto_depIdxs = []int32{
-	9,  // 0: gtopng.v1.AgentMessage.snapshot:type_name -> gtopng.v1.TrafficSnapshot
-	10, // 1: gtopng.v1.AgentMessage.hosts:type_name -> gtopng.v1.Host
-	11, // 2: gtopng.v1.AgentMessage.flows:type_name -> gtopng.v1.Flow
-	15, // 3: gtopng.v1.AgentMessage.protocols:type_name -> gtopng.v1.ProtocolStat
-	4,  // 4: gtopng.v1.AgentMessage.dns_queries:type_name -> gtopng.v1.DNSQuery
-	5,  // 5: gtopng.v1.AgentMessage.packet_size_dist:type_name -> gtopng.v1.PacketSizeDist
-	3,  // 6: gtopng.v1.AgentMessage.system_health:type_name -> gtopng.v1.SystemHealth
-	12, // 7: gtopng.v1.AgentMessage.tcp_metrics:type_name -> gtopng.v1.TCPMetrics
-	14, // 8: gtopng.v1.AgentMessage.latency:type_name -> gtopng.v1.LatencySnapshot
-	7,  // 9: gtopng.v1.ServerMessage.ack:type_name -> gtopng.v1.Ack
-	8,  // 10: gtopng.v1.ServerMessage.config_update:type_name -> gtopng.v1.ConfigUpdate
-	17, // 11: gtopng.v1.ServerMessage.intercept_update:type_name -> gtopng.v1.InterceptConfigUpdate
-	13, // 12: gtopng.v1.LatencySnapshot.dns_latency:type_name -> gtopng.v1.LatencyStats
-	13, // 13: gtopng.v1.LatencySnapshot.tls_latency:type_name -> gtopng.v1.LatencyStats
-	13, // 14: gtopng.v1.LatencySnapshot.tcp_latency:type_name -> gtopng.v1.LatencyStats
-	16, // 15: gtopng.v1.InterceptConfigUpdate.rules:type_name -> gtopng.v1.InterceptRule
-	0,  // 16: gtopng.v1.AgentService.Register:input_type -> gtopng.v1.RegisterRequest
-	2,  // 17: gtopng.v1.AgentService.StreamSnapshots:input_type -> gtopng.v1.AgentMessage
-	1,  // 18: gtopng.v1.AgentService.Register:output_type -> gtopng.v1.RegisterResponse
-	6,  // 19: gtopng.v1.AgentService.StreamSnapshots:output_type -> gtopng.v1.ServerMessage
+var file_netgazer_v1_agent_proto_depIdxs = []int32{
+	9,  // 0: netgazer.v1.AgentMessage.snapshot:type_name -> netgazer.v1.TrafficSnapshot
+	10, // 1: netgazer.v1.AgentMessage.hosts:type_name -> netgazer.v1.Host
+	11, // 2: netgazer.v1.AgentMessage.flows:type_name -> netgazer.v1.Flow
+	15, // 3: netgazer.v1.AgentMessage.protocols:type_name -> netgazer.v1.ProtocolStat
+	4,  // 4: netgazer.v1.AgentMessage.dns_queries:type_name -> netgazer.v1.DNSQuery
+	5,  // 5: netgazer.v1.AgentMessage.packet_size_dist:type_name -> netgazer.v1.PacketSizeDist
+	3,  // 6: netgazer.v1.AgentMessage.system_health:type_name -> netgazer.v1.SystemHealth
+	12, // 7: netgazer.v1.AgentMessage.tcp_metrics:type_name -> netgazer.v1.TCPMetrics
+	14, // 8: netgazer.v1.AgentMessage.latency:type_name -> netgazer.v1.LatencySnapshot
+	7,  // 9: netgazer.v1.ServerMessage.ack:type_name -> netgazer.v1.Ack
+	8,  // 10: netgazer.v1.ServerMessage.config_update:type_name -> netgazer.v1.ConfigUpdate
+	17, // 11: netgazer.v1.ServerMessage.intercept_update:type_name -> netgazer.v1.InterceptConfigUpdate
+	13, // 12: netgazer.v1.LatencySnapshot.dns_latency:type_name -> netgazer.v1.LatencyStats
+	13, // 13: netgazer.v1.LatencySnapshot.tls_latency:type_name -> netgazer.v1.LatencyStats
+	13, // 14: netgazer.v1.LatencySnapshot.tcp_latency:type_name -> netgazer.v1.LatencyStats
+	16, // 15: netgazer.v1.InterceptConfigUpdate.rules:type_name -> netgazer.v1.InterceptRule
+	0,  // 16: netgazer.v1.AgentService.Register:input_type -> netgazer.v1.RegisterRequest
+	2,  // 17: netgazer.v1.AgentService.StreamSnapshots:input_type -> netgazer.v1.AgentMessage
+	1,  // 18: netgazer.v1.AgentService.Register:output_type -> netgazer.v1.RegisterResponse
+	6,  // 19: netgazer.v1.AgentService.StreamSnapshots:output_type -> netgazer.v1.ServerMessage
 	18, // [18:20] is the sub-list for method output_type
 	16, // [16:18] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
@@ -1735,12 +1735,12 @@ var file_gtopng_v1_agent_proto_depIdxs = []int32{
 	0,  // [0:16] is the sub-list for field type_name
 }
 
-func init() { file_gtopng_v1_agent_proto_init() }
-func file_gtopng_v1_agent_proto_init() {
-	if File_gtopng_v1_agent_proto != nil {
+func init() { file_netgazer_v1_agent_proto_init() }
+func file_netgazer_v1_agent_proto_init() {
+	if File_netgazer_v1_agent_proto != nil {
 		return
 	}
-	file_gtopng_v1_agent_proto_msgTypes[6].OneofWrappers = []any{
+	file_netgazer_v1_agent_proto_msgTypes[6].OneofWrappers = []any{
 		(*ServerMessage_Ack)(nil),
 		(*ServerMessage_ConfigUpdate)(nil),
 		(*ServerMessage_InterceptUpdate)(nil),
@@ -1749,17 +1749,17 @@ func file_gtopng_v1_agent_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_gtopng_v1_agent_proto_rawDesc), len(file_gtopng_v1_agent_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_netgazer_v1_agent_proto_rawDesc), len(file_netgazer_v1_agent_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_gtopng_v1_agent_proto_goTypes,
-		DependencyIndexes: file_gtopng_v1_agent_proto_depIdxs,
-		MessageInfos:      file_gtopng_v1_agent_proto_msgTypes,
+		GoTypes:           file_netgazer_v1_agent_proto_goTypes,
+		DependencyIndexes: file_netgazer_v1_agent_proto_depIdxs,
+		MessageInfos:      file_netgazer_v1_agent_proto_msgTypes,
 	}.Build()
-	File_gtopng_v1_agent_proto = out.File
-	file_gtopng_v1_agent_proto_goTypes = nil
-	file_gtopng_v1_agent_proto_depIdxs = nil
+	File_netgazer_v1_agent_proto = out.File
+	file_netgazer_v1_agent_proto_goTypes = nil
+	file_netgazer_v1_agent_proto_depIdxs = nil
 }

@@ -12,7 +12,8 @@ COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 
 COPY backend/ .
-RUN CGO_ENABLED=1 go build -ldflags="-s -w" -o /out/netgazer-server ./cmd/server
+RUN CGO_ENABLED=1 go build -ldflags="-s -w -extldflags=-Wl,-rpath,\$ORIGIN,--disable-new-dtags" \
+    -o /out/netgazer-server ./cmd/server
 
 # ============================================================
 # Stage 2: Build frontend
@@ -37,7 +38,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && adduser --system --home /var/lib/netgazer --no-create-home netgazer
 
 COPY --from=backend-builder /out/netgazer-server /usr/local/bin/netgazer-server
-COPY --from=frontend-builder /src/dist /opt/netgazer/frontend
+COPY --from=frontend-builder /src/dist /opt/netgazer/frontend/dist
 
 RUN mkdir -p /var/lib/netgazer/geoip && \
     chown -R netgazer:netgazer /var/lib/netgazer /opt/netgazer
@@ -47,4 +48,7 @@ EXPOSE 8080 50051
 VOLUME ["/var/lib/netgazer"]
 
 ENTRYPOINT ["netgazer-server"]
-CMD ["--http-port", "8080", "--grpc-port", "50051", "--db", "/var/lib/netgazer/netgazer.db"]
+CMD ["--http-port", "8080", \
+     "--grpc-port", "50051", \
+     "--db", "/var/lib/netgazer/netgazer.db", \
+     "--web-dir", "/opt/netgazer/frontend/dist"]

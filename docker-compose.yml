@@ -3,20 +3,33 @@ services:
     build: .
     container_name: netgazer-server
     restart: unless-stopped
-    ports:
-      - "8080:8080"    # HTTP API + WebSocket + Dashboard
-      - "50051:50051"  # gRPC (agent communication)
+    expose:
+      - "8080"
+      - "50051"
     volumes:
       - netgazer_data:/var/lib/netgazer
-      - ./deploy/nginx/gtopng.conf:/opt/netgazer/nginx.conf:ro  # optional nginx config reference
     environment:
       - TZ=Asia/Shanghai
     command:
       - "--http-port=8080"
       - "--grpc-port=50051"
       - "--db=/var/lib/netgazer/netgazer.db"
+      - "--web-dir=/opt/netgazer/frontend/dist"
       - "--geoip-country-db=/var/lib/netgazer/geoip/country.mmdb"
       - "--geoip-asn-db=/var/lib/netgazer/geoip/asn.mmdb"
+
+  # nginx 反代：处理 HTTP 页面/API/WebSocket + gRPC 代理
+  netgazer-nginx:
+    image: nginx:alpine
+    container_name: netgazer-nginx
+    restart: unless-stopped
+    ports:
+      - "9527:80"       # HTTP → Dashboard / API / WebSocket
+      - "50051:50051"    # gRPC → Agent 连接（HTTP/2）
+    volumes:
+      - ./deploy/nginx/netgazer-docker.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - netgazer-server
 
 volumes:
   netgazer_data:

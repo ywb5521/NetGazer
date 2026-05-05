@@ -10,19 +10,19 @@ import (
 	"os"
 	"sync"
 
-	gtopngv1 "github.com/gtopng/backend/gen/gtopng/v1"
-	"github.com/gtopng/backend/internal/aggregator"
-	"github.com/gtopng/backend/internal/config"
+	netgazerv1 "github.com/netgazer/backend/gen/netgazer/v1"
+	"github.com/netgazer/backend/internal/aggregator"
+	"github.com/netgazer/backend/internal/config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/reflection"
 )
 
 type GRPCServer struct {
-	gtopngv1.UnimplementedAgentServiceServer
+	netgazerv1.UnimplementedAgentServiceServer
 	agg                *aggregator.Aggregator
 	mu                 sync.RWMutex
-	clients            map[string]gtopngv1.AgentService_StreamSnapshotsServer
+	clients            map[string]netgazerv1.AgentService_StreamSnapshotsServer
 	nodeAuthEnabled    bool
 	tokenValidator     func(token string) bool
 	authenticatedNodes map[string]bool
@@ -31,18 +31,18 @@ type GRPCServer struct {
 func NewGRPCServer(agg *aggregator.Aggregator, nodeAuthEnabled bool, tokenValidator func(string) bool) *GRPCServer {
 	return &GRPCServer{
 		agg:                agg,
-		clients:            make(map[string]gtopngv1.AgentService_StreamSnapshotsServer),
+		clients:            make(map[string]netgazerv1.AgentService_StreamSnapshotsServer),
 		nodeAuthEnabled:    nodeAuthEnabled,
 		tokenValidator:     tokenValidator,
 		authenticatedNodes: make(map[string]bool),
 	}
 }
 
-func (s *GRPCServer) Register(ctx context.Context, req *gtopngv1.RegisterRequest) (*gtopngv1.RegisterResponse, error) {
+func (s *GRPCServer) Register(ctx context.Context, req *netgazerv1.RegisterRequest) (*netgazerv1.RegisterResponse, error) {
 	if s.nodeAuthEnabled {
 		if req.AuthToken == "" || !s.tokenValidator(req.AuthToken) {
 			log.Printf("[server] agent registration rejected: node_id=%s (invalid auth token)", req.NodeId)
-			return &gtopngv1.RegisterResponse{
+			return &netgazerv1.RegisterResponse{
 				Accepted: false,
 				Message:  "invalid auth token",
 			}, nil
@@ -58,14 +58,14 @@ func (s *GRPCServer) Register(ctx context.Context, req *gtopngv1.RegisterRequest
 	}
 	log.Printf("[server] agent registered: node_id=%s interfaces=%v tags=%v", req.NodeId, ifaces, req.Tags)
 	s.agg.RegisterNode(req.NodeId, ifaces, req.Version, req.Tags)
-	return &gtopngv1.RegisterResponse{
+	return &netgazerv1.RegisterResponse{
 		Accepted:           true,
 		Message:            "welcome",
 		SnapshotIntervalMs: 1000,
 	}, nil
 }
 
-func (s *GRPCServer) StreamSnapshots(stream gtopngv1.AgentService_StreamSnapshotsServer) error {
+func (s *GRPCServer) StreamSnapshots(stream netgazerv1.AgentService_StreamSnapshotsServer) error {
 	var nodeID string
 
 	for {
@@ -111,7 +111,7 @@ func (s *GRPCServer) StreamSnapshots(stream gtopngv1.AgentService_StreamSnapshot
 		s.agg.Ingest(msg)
 
 		// Optional: send ack
-		// stream.Send(&gtopngv1.ServerMessage{...})
+		// stream.Send(&netgazerv1.ServerMessage{...})
 	}
 }
 
@@ -119,9 +119,9 @@ func (s *GRPCServer) BroadcastConfigUpdate(bpfFilter string, intervalMs int32) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	for nodeID, stream := range s.clients {
-		msg := &gtopngv1.ServerMessage{
-			Message: &gtopngv1.ServerMessage_ConfigUpdate{
-				ConfigUpdate: &gtopngv1.ConfigUpdate{
+		msg := &netgazerv1.ServerMessage{
+			Message: &netgazerv1.ServerMessage_ConfigUpdate{
+				ConfigUpdate: &netgazerv1.ConfigUpdate{
 					BpfFilter:             bpfFilter,
 					NewSnapshotIntervalMs: intervalMs,
 				},
@@ -137,7 +137,7 @@ func (s *GRPCServer) BroadcastConfigUpdate(bpfFilter string, intervalMs int32) {
 }
 
 // SendInterceptRules sends intercept rules to specified nodes (or all if targetNodes is empty).
-func (s *GRPCServer) SendInterceptRules(targetNodes []string, rules []*gtopngv1.InterceptRule) {
+func (s *GRPCServer) SendInterceptRules(targetNodes []string, rules []*netgazerv1.InterceptRule) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -152,9 +152,9 @@ func (s *GRPCServer) SendInterceptRules(targetNodes []string, rules []*gtopngv1.
 		if !allNodes && !targets[nodeID] {
 			continue
 		}
-		msg := &gtopngv1.ServerMessage{
-			Message: &gtopngv1.ServerMessage_InterceptUpdate{
-				InterceptUpdate: &gtopngv1.InterceptConfigUpdate{
+		msg := &netgazerv1.ServerMessage{
+			Message: &netgazerv1.ServerMessage_InterceptUpdate{
+				InterceptUpdate: &netgazerv1.InterceptConfigUpdate{
 					TargetNodes: targetNodes,
 					Rules:       rules,
 				},
@@ -211,7 +211,7 @@ func StartGRPCServer(cfg *config.ServerConfig, agg *aggregator.Aggregator, nodeA
 
 	srv := grpc.NewServer(opts...)
 	svc := NewGRPCServer(agg, nodeAuthEnabled, tokenValidator)
-	gtopngv1.RegisterAgentServiceServer(srv, svc)
+	netgazerv1.RegisterAgentServiceServer(srv, svc)
 	reflection.Register(srv)
 	return svc, srv, nil
 }

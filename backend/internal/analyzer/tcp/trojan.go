@@ -3,7 +3,7 @@ package tcp
 import (
 	"bytes"
 
-	"github.com/gtopng/backend/internal/analyzer"
+	"github.com/netgazer/backend/internal/analyzer"
 )
 
 var _ analyzer.TCPAnalyzer = (*TrojanAnalyzer)(nil)

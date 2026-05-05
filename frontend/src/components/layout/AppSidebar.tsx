@@ -43,7 +43,7 @@ export function AppSidebar() {
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary">
             <span className="text-xs font-bold text-primary-foreground">G</span>
           </div>
-          <span className="font-semibold text-sm">gtopng</span>
+          <span className="font-semibold text-sm">netgazer</span>
         </div>
         <Button
           variant="ghost"

@@ -48,7 +48,7 @@ const WIDGET_DASHBOARD_KEY: Record<WidgetKey, string> = {
   nodes: 'nodesOverview',
 };
 
-const STORAGE_KEY = 'gtopng-dashboard-widgets';
+const STORAGE_KEY = 'netgazer-dashboard-widgets';
 
 function loadWidgetVisibility(): Record<WidgetKey, boolean> {
   try {

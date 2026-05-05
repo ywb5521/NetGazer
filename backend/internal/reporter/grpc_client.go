@@ -10,9 +10,9 @@ import (
 	"os"
 	"time"
 
-	gtopngv1 "github.com/gtopng/backend/gen/gtopng/v1"
-	"github.com/gtopng/backend/internal/agenthealth"
-	"github.com/gtopng/backend/internal/tracker"
+	netgazerv1 "github.com/netgazer/backend/gen/netgazer/v1"
+	"github.com/netgazer/backend/internal/agenthealth"
+	"github.com/netgazer/backend/internal/tracker"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -31,8 +31,8 @@ type IfacePipe struct {
 type GRPCClient struct {
 	serverAddr   string
 	conn         *grpc.ClientConn
-	client       gtopngv1.AgentServiceClient
-	stream       gtopngv1.AgentService_StreamSnapshotsClient
+	client       netgazerv1.AgentServiceClient
+	stream       netgazerv1.AgentService_StreamSnapshotsClient
 	nodeID       string
 	ifacePipes   []*IfacePipe
 	version      string
@@ -43,14 +43,14 @@ type GRPCClient struct {
 	tlsKey       string
 	tlsCA        string
 	authToken    string
-	onInterceptRules func(rules []*gtopngv1.InterceptRule)
+	onInterceptRules func(rules []*netgazerv1.InterceptRule)
 }
 
 func (c *GRPCClient) SetHealth(h *agenthealth.Health) {
 	c.systemHealth = h
 }
 
-func (c *GRPCClient) SetInterceptCallback(fn func(rules []*gtopngv1.InterceptRule)) {
+func (c *GRPCClient) SetInterceptCallback(fn func(rules []*netgazerv1.InterceptRule)) {
 	c.onInterceptRules = fn
 }
 
@@ -108,7 +108,7 @@ func (c *GRPCClient) Connect(ctx context.Context) error {
 		return fmt.Errorf("dial: %w", err)
 	}
 	c.conn = conn
-	c.client = gtopngv1.NewAgentServiceClient(conn)
+	c.client = netgazerv1.NewAgentServiceClient(conn)
 
 	// Build interface names list
 	var ifaceNames []string
@@ -121,7 +121,7 @@ func (c *GRPCClient) Connect(ctx context.Context) error {
 	if len(ifaceNames) > 0 {
 		firstIface = ifaceNames[0]
 	}
-	resp, err := c.client.Register(ctx, &gtopngv1.RegisterRequest{
+	resp, err := c.client.Register(ctx, &netgazerv1.RegisterRequest{
 		NodeId:     c.nodeID,
 		Interface:  firstIface,
 		Version:    c.version,
@@ -191,9 +191,9 @@ func (c *GRPCClient) readServerMessages(ctx context.Context) {
 			return
 		}
 		switch m := msg.Message.(type) {
-		case *gtopngv1.ServerMessage_Ack:
+		case *netgazerv1.ServerMessage_Ack:
 			_ = m.Ack.ReceivedTimestampUnixMs
-		case *gtopngv1.ServerMessage_ConfigUpdate:
+		case *netgazerv1.ServerMessage_ConfigUpdate:
 			if m.ConfigUpdate.NewSnapshotIntervalMs > 0 {
 				c.interval = time.Duration(m.ConfigUpdate.NewSnapshotIntervalMs) * time.Millisecond
 				log.Printf("[agent] config update: new interval %v", c.interval)
@@ -201,7 +201,7 @@ func (c *GRPCClient) readServerMessages(ctx context.Context) {
 			if m.ConfigUpdate.BpfFilter != "" {
 				log.Printf("[agent] config update: new BPF filter '%s' (requires agent restart to apply)", m.ConfigUpdate.BpfFilter)
 			}
-		case *gtopngv1.ServerMessage_InterceptUpdate:
+		case *netgazerv1.ServerMessage_InterceptUpdate:
 			log.Printf("[agent] received intercept rules update (%d rules)", len(m.InterceptUpdate.Rules))
 			if c.onInterceptRules != nil {
 				c.onInterceptRules(m.InterceptUpdate.Rules)
@@ -210,14 +210,14 @@ func (c *GRPCClient) readServerMessages(ctx context.Context) {
 	}
 }
 
-func (c *GRPCClient) buildSnapshots() []*gtopngv1.AgentMessage {
+func (c *GRPCClient) buildSnapshots() []*netgazerv1.AgentMessage {
 	now := time.Now()
 	intervalSec := c.interval.Seconds()
 	if intervalSec <= 0 {
 		intervalSec = 1
 	}
 
-	var msgs []*gtopngv1.AgentMessage
+	var msgs []*netgazerv1.AgentMessage
 
 	for _, pipe := range c.ifacePipes {
 		msg := c.buildInterfaceSnapshot(pipe, now, intervalSec)
@@ -227,16 +227,16 @@ func (c *GRPCClient) buildSnapshots() []*gtopngv1.AgentMessage {
 	return msgs
 }
 
-func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, intervalSec float64) *gtopngv1.AgentMessage {
+func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, intervalSec float64) *netgazerv1.AgentMessage {
 	hosts := pipe.HostTracker.Snapshot()
 	flows := pipe.FlowTracker.Snapshot()
 	protocols := pipe.ProtoTracker.Snapshot()
 
 	var totalBytesPerSec, totalPacketsPerSec float64
 
-	pbHosts := make([]*gtopngv1.Host, len(hosts))
+	pbHosts := make([]*netgazerv1.Host, len(hosts))
 	for i, h := range hosts {
-		pbHosts[i] = &gtopngv1.Host{
+		pbHosts[i] = &netgazerv1.Host{
 			Ip:              h.IP,
 			Mac:             h.MAC,
 			Hostname:        h.Hostname,
@@ -251,9 +251,9 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 		}
 	}
 
-	pbFlows := make([]*gtopngv1.Flow, len(flows))
+	pbFlows := make([]*netgazerv1.Flow, len(flows))
 	for i, f := range flows {
-		pbFlows[i] = &gtopngv1.Flow{
+		pbFlows[i] = &netgazerv1.Flow{
 			Id:              f.ID,
 			SrcIp:           f.SrcIP,
 			DstIp:           f.DstIP,
@@ -268,9 +268,9 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 		}
 	}
 
-	pbProtocols := make([]*gtopngv1.ProtocolStat, len(protocols))
+	pbProtocols := make([]*netgazerv1.ProtocolStat, len(protocols))
 	for i, p := range protocols {
-		pbProtocols[i] = &gtopngv1.ProtocolStat{
+		pbProtocols[i] = &netgazerv1.ProtocolStat{
 			Protocol:   p.Protocol,
 			Bytes:      p.Bytes,
 			Packets:    p.Packets,
@@ -284,9 +284,9 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 	totalPacketsPerSec /= intervalSec
 
 	dnsQueries := pipe.DNSTracker.Top(50)
-	pbDNS := make([]*gtopngv1.DNSQuery, len(dnsQueries))
+	pbDNS := make([]*netgazerv1.DNSQuery, len(dnsQueries))
 	for i, q := range dnsQueries {
-		pbDNS[i] = &gtopngv1.DNSQuery{
+		pbDNS[i] = &netgazerv1.DNSQuery{
 			QueryName: q.QueryName,
 			Count:     q.Count,
 			Bytes:     q.Bytes,
@@ -294,7 +294,7 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 	}
 
 	psd := pipe.PacketSizeTracker.Snapshot()
-	pbPSD := &gtopngv1.PacketSizeDist{
+	pbPSD := &netgazerv1.PacketSizeDist{
 		Size_64:    psd.Size64,
 		Size_128:   psd.Size128,
 		Size_256:   psd.Size256,
@@ -306,7 +306,7 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 
 
 		tcpSummary := pipe.TCPMetrics.Snapshot()
-		pbTCP := &gtopngv1.TCPMetrics{
+		pbTCP := &netgazerv1.TCPMetrics{
 			ActiveTcpFlows:   int32(tcpSummary.ActiveTCPFlows),
 			TotalRetransmits: tcpSummary.TotalRetransmits,
 			TotalRsts:        tcpSummary.TotalRSTs,
@@ -317,11 +317,11 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 			RttMaxMs:         tcpSummary.RTTMaxMS,
 			RttSamples:       tcpSummary.RTTSamples,
 		}
-	msg := &gtopngv1.AgentMessage{
+	msg := &netgazerv1.AgentMessage{
 		NodeId:          c.nodeID,
 		TimestampUnixMs: now.UnixMilli(),
 		Interface:       pipe.Name,
-		Snapshot: &gtopngv1.TrafficSnapshot{
+		Snapshot: &netgazerv1.TrafficSnapshot{
 			BytesPerSec:   totalBytesPerSec,
 			PacketsPerSec: totalPacketsPerSec,
 			FlowsCount:    int32(len(flows)),
@@ -336,7 +336,7 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 
 	// System health is per-node, only attach on first interface to avoid duplication
 	if c.systemHealth != nil {
-		msg.SystemHealth = &gtopngv1.SystemHealth{
+		msg.SystemHealth = &netgazerv1.SystemHealth{
 			CpuPercent:     c.systemHealth.CPUPercent,
 			MemPercent:     c.systemHealth.MemPercent,
 			MemUsedBytes:   c.systemHealth.MemUsedBytes,

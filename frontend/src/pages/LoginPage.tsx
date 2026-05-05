@@ -37,7 +37,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Shield className="h-6 w-6 text-primary" />
           </div>
-          <CardTitle className="text-xl">gtopng</CardTitle>
+          <CardTitle className="text-xl">netgazer</CardTitle>
           <CardDescription>{t.auth.loginPrompt}</CardDescription>
         </CardHeader>
         <CardContent>

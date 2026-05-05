@@ -272,7 +272,7 @@ func (e *Engine) LookupASN(ip string) *ASNInfo {
 	return LookupASN(ip)
 }
 
-const GeoipDir = "/var/lib/gtopng/geoip"
+const GeoipDir = "/var/lib/netgazer/geoip"
 
 // EnsureDir creates the GeoIP data directory if it doesn't exist.
 func EnsureDir() error {

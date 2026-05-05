@@ -3,8 +3,8 @@ package tcp
 import (
 	"net"
 
-	"github.com/gtopng/backend/internal/analyzer"
-	"github.com/gtopng/backend/internal/analyzer/utils"
+	"github.com/netgazer/backend/internal/analyzer"
+	"github.com/netgazer/backend/internal/analyzer/utils"
 )
 
 const (

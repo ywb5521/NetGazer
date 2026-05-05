@@ -58,13 +58,14 @@ type ServerConfig struct {
 	GeoIPCountryDB     string // path to MaxMind GeoLite2 Country mmdb file
 	GeoIPASNDB         string // path to MaxMind GeoLite2 ASN mmdb file
 	NodeAuth           bool   // require auth token for agent registration
+	WebDir             string // path to frontend dist directory (enables static file serving)
 }
 
 func ParseServerFlags() *ServerConfig {
 	cfg := &ServerConfig{}
 	flag.IntVar(&cfg.GRPCPort, "grpc-port", 50051, "gRPC listen port")
 	flag.IntVar(&cfg.HTTPPort, "http-port", 8080, "HTTP/WebSocket listen port")
-	flag.StringVar(&cfg.DBPath, "db", "./gtopng.db", "SQLite database path")
+	flag.StringVar(&cfg.DBPath, "db", "./netgazer.db", "SQLite database path")
 	flag.DurationVar(&cfg.Retention, "retention", 24*time.Hour, "Data retention duration")
 	flag.StringVar(&cfg.TLSCert, "tls-cert", "", "gRPC TLS certificate path")
 	flag.StringVar(&cfg.TLSKey, "tls-key", "", "gRPC TLS key path")
@@ -79,12 +80,13 @@ func ParseServerFlags() *ServerConfig {
 	flag.StringVar(&cfg.GeoIPCountryDB, "geoip-country-db", "", "Path to MaxMind GeoLite2 Country mmdb file")
 	flag.StringVar(&cfg.GeoIPASNDB, "geoip-asn-db", "", "Path to MaxMind GeoLite2 ASN mmdb file")
 	flag.BoolVar(&cfg.NodeAuth, "node-auth", false, "Require auth token for agent registration")
+	flag.StringVar(&cfg.WebDir, "web-dir", "", "Path to frontend dist directory (enables built-in static file serving)")
 	flag.StringVar(&cfg.WebhookURL, "webhook-url", "", "Webhook URL for alert notifications")
-	if port := os.Getenv("GTOPNG_HTTP_PORT"); port != "" {
+	if port := os.Getenv("NETGAZER_HTTP_PORT"); port != "" {
 		// overridden after parse
 	}
 	flag.Parse()
-	if port := os.Getenv("GTOPNG_HTTP_PORT"); port != "" {
+	if port := os.Getenv("NETGAZER_HTTP_PORT"); port != "" {
 		cfg.HTTPPort = parseInt(port)
 	}
 	cfg.SnapshotInterval = 1 * time.Second
@@ -104,7 +106,7 @@ func ParseServerFlags() *ServerConfig {
 	// Generate random JWT secret (persisted to DB, loaded on restart)
 	cfg.JWTSecret = make([]byte, 32)
 	if _, err := rand.Read(cfg.JWTSecret); err != nil {
-		cfg.JWTSecret = []byte("gtopng-dev-insecure-secret-key!!")
+		cfg.JWTSecret = []byte("netgazer-dev-insecure-secret-key!!")
 	}
 	return cfg
 }

@@ -6,7 +6,7 @@ import (
 	"slices"
 	"sync"
 
-	"github.com/gtopng/backend/internal/analyzer"
+	"github.com/netgazer/backend/internal/analyzer"
 )
 
 var (

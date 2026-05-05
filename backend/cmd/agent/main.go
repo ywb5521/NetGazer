@@ -10,12 +10,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gtopng/backend/internal/agenthealth"
-	"github.com/gtopng/backend/internal/capture"
-	"github.com/gtopng/backend/internal/config"
-	"github.com/gtopng/backend/internal/ndpi"
-	"github.com/gtopng/backend/internal/reporter"
-	"github.com/gtopng/backend/internal/tracker"
+	"github.com/netgazer/backend/internal/agenthealth"
+	"github.com/netgazer/backend/internal/capture"
+	"github.com/netgazer/backend/internal/config"
+	"github.com/netgazer/backend/internal/ndpi"
+	"github.com/netgazer/backend/internal/reporter"
+	"github.com/netgazer/backend/internal/tracker"
 )
 
 var version = "0.1.0"
@@ -23,7 +23,7 @@ var version = "0.1.0"
 func main() {
 	cfg := config.ParseAgentFlags()
 
-	log.Printf("[agent] gtopng-agent %s starting on interfaces %v", version, cfg.Interfaces)
+	log.Printf("[agent] netgazer-agent %s starting on interfaces %v", version, cfg.Interfaces)
 	log.Printf("[agent] server: %s | node-id: %s", cfg.ServerAddr, cfg.NodeID)
 
 	ctx, cancel := context.WithCancel(context.Background())

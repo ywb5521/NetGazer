@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"github.com/gtopng/backend/internal/models"
+	"github.com/netgazer/backend/internal/models"
 )
 
 type Manager struct {

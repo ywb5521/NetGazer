@@ -21,7 +21,7 @@ function toISO(stat: CountryStat): string {
 export default function GeoPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
-  const [tab, setTab] = useLocalStorage('gtopng-geo-tab', 'map');
+  const [tab, setTab] = useLocalStorage('netgazer-geo-tab', 'map');
   const [countries, setCountries] = useState<CountryStat[]>([]);
   const [asns, setAsns] = useState<ASNStat[]>([]);
   const [loading, setLoading] = useState(true);

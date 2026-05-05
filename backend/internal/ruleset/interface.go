@@ -5,8 +5,8 @@ import (
 	"net"
 	"strconv"
 
-	"github.com/gtopng/backend/internal/analyzer"
-	"github.com/gtopng/backend/internal/modifier"
+	"github.com/netgazer/backend/internal/analyzer"
+	"github.com/netgazer/backend/internal/modifier"
 )
 
 type Action int

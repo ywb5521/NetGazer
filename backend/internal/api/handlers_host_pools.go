@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/gtopng/backend/internal/storage"
+	"github.com/netgazer/backend/internal/storage"
 )
 
 func (s *Server) ListHostPools(w http.ResponseWriter, r *http.Request) {

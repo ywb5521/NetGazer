@@ -21,8 +21,8 @@ const PAGE_SIZE = 20;
 export default function AlertsPage() {
   const { snapshot, ackAlert, selectedNode } = useAppContext();
   const { t } = useI18n();
-  const [severityFilter, setSeverityFilter] = useLocalStorage('gtopng-alerts-severity', 'all');
-  const [typeFilter, setTypeFilter] = useLocalStorage('gtopng-alerts-type', 'all');
+  const [severityFilter, setSeverityFilter] = useLocalStorage('netgazer-alerts-severity', 'all');
+  const [typeFilter, setTypeFilter] = useLocalStorage('netgazer-alerts-type', 'all');
   const [searchText, setSearchText] = useState('');
   const [sortNewest, setSortNewest] = useState(true);
   const [page, setPage] = useState(0);
