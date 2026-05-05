@@ -89,6 +89,10 @@ jobs:
                 continue
               fi
               if [ -n "$path" ] && [ -f "$path" ]; then
+                # Skip if already in output dir (found via RPATH $ORIGIN from earlier bundle)
+                case "$path" in
+                  /tmp/out/*) continue ;;
+                esac
                 echo "  BUNDLE: $path -> /tmp/out/"
                 cp "$path" /tmp/out/
               fi
