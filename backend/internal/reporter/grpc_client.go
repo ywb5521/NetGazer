@@ -74,26 +74,34 @@ func NewGRPCClient(serverAddr, nodeID string, pipes []*IfacePipe, version string
 func (c *GRPCClient) Connect(ctx context.Context) error {
 	var opts []grpc.DialOption
 
-	// Passthrough bypasses gRPC's built-in DNS resolver so we can force
-	// IPv4-only resolution in the custom dialer below.
-	target := "passthrough:///" + c.serverAddr
+	target := c.serverAddr
 
-	// Force IPv4 DNS + dial to avoid IPv6 addresses (e.g. Cloudflare CDN
-	// AAAA records) when the host has no IPv6 routing.
+	// Override IPv6 connections with IPv4 when DNS returns AAAA records
+	// (e.g. Cloudflare CDN) but the host has no IPv6 routing.
+	// gRPC's default DNS resolver handles TLS SNI/:authority correctly;
+	// we only intercept the actual TCP dial to swap v6 → v4.
 	opts = append(opts, grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
-		host, port, err := net.SplitHostPort(addr)
+		host, _, err := net.SplitHostPort(addr)
 		if err != nil {
 			return nil, fmt.Errorf("parse addr %q: %w", addr, err)
 		}
-		ips, err := net.DefaultResolver.LookupIP(ctx, "ip4", host)
-		if err != nil {
-			return nil, fmt.Errorf("ipv4 lookup %s: %w", host, err)
+		ip := net.ParseIP(host)
+		if ip != nil && ip.To4() == nil {
+			// IPv6 address — re-resolve the original hostname to IPv4
+			origHost, origPort, err := net.SplitHostPort(c.serverAddr)
+			if err != nil {
+				return nil, fmt.Errorf("parse server addr: %w", err)
+			}
+			ips, err := net.DefaultResolver.LookupIP(ctx, "ip4", origHost)
+			if err != nil {
+				return nil, fmt.Errorf("ipv4 lookup %s: %w", origHost, err)
+			}
+			if len(ips) == 0 {
+				return nil, fmt.Errorf("no IPv4 address found for %s", origHost)
+			}
+			return (&net.Dialer{}).DialContext(ctx, "tcp", net.JoinHostPort(ips[0].String(), origPort))
 		}
-		if len(ips) == 0 {
-			return nil, fmt.Errorf("no IPv4 address found for %s", host)
-		}
-		d := net.Dialer{}
-		return d.DialContext(ctx, "tcp", net.JoinHostPort(ips[0].String(), port))
+		return (&net.Dialer{}).DialContext(ctx, "tcp", addr)
 	}))
 
 	if c.tlsCA != "" || (c.tlsCert != "" && c.tlsKey != "") {
