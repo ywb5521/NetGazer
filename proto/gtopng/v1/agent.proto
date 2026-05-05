@@ -1,0 +1,166 @@
+syntax = "proto3";
+package gtopng.v1;
+option go_package = "github.com/gtopng/backend/gen/gtopng/v1;gtopngv1";
+
+service AgentService {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc StreamSnapshots(stream AgentMessage) returns (stream ServerMessage);
+}
+
+message RegisterRequest {
+  string node_id = 1;
+  string interface = 2;
+  string version = 3;
+  repeated string tags = 4;
+  repeated string interfaces = 5;
+  string auth_token = 6;
+}
+
+message RegisterResponse {
+  bool accepted = 1;
+  string message = 2;
+  int32 snapshot_interval_ms = 3;
+}
+
+message AgentMessage {
+  string node_id = 1;
+  int64 timestamp_unix_ms = 2;
+
+  TrafficSnapshot snapshot = 3;
+  repeated Host hosts = 4;
+  repeated Flow flows = 5;
+  repeated ProtocolStat protocols = 6;
+  repeated DNSQuery dns_queries = 7;
+  PacketSizeDist packet_size_dist = 8;
+  SystemHealth system_health = 9;
+  string interface = 10;
+  TCPMetrics tcp_metrics = 11;
+  LatencySnapshot latency = 12;
+}
+
+message SystemHealth {
+  double cpu_percent = 1;
+  double mem_percent = 2;
+  uint64 mem_used_bytes = 3;
+  uint64 mem_total_bytes = 4;
+  uint64 disk_free_bytes = 5;
+  uint64 disk_total_bytes = 6;
+  uint64 uptime_seconds = 7;
+}
+
+message DNSQuery {
+  string query_name = 1;
+  uint32 query_type = 2;
+  uint64 count = 3;
+  uint64 bytes = 4;
+}
+
+message PacketSizeDist {
+  uint64 size_64 = 1;
+  uint64 size_128 = 2;
+  uint64 size_256 = 3;
+  uint64 size_512 = 4;
+  uint64 size_1024 = 5;
+  uint64 size_1500 = 6;
+  uint64 size_gt1500 = 7;
+}
+
+message ServerMessage {
+  oneof message {
+    Ack ack = 1;
+    ConfigUpdate config_update = 2;
+    InterceptConfigUpdate intercept_update = 3;
+  }
+}
+
+message Ack {
+  int64 received_timestamp_unix_ms = 1;
+}
+
+message ConfigUpdate {
+  int32 new_snapshot_interval_ms = 1;
+  string bpf_filter = 2;
+}
+
+message TrafficSnapshot {
+  double bytes_per_sec = 1;
+  double packets_per_sec = 2;
+  int32 flows_count = 3;
+}
+
+message Host {
+  string ip = 1;
+  string mac = 2;
+  string hostname = 3;
+  uint64 bytes_sent = 4;
+  uint64 bytes_received = 5;
+  uint64 packets_sent = 6;
+  uint64 packets_received = 7;
+  int64 first_seen_unix_ms = 8;
+  int64 last_seen_unix_ms = 9;
+  string vendor = 10;
+  int32 active_flows = 11;
+}
+
+message Flow {
+  string id = 1;
+  string src_ip = 2;
+  string dst_ip = 3;
+  uint32 src_port = 4;
+  uint32 dst_port = 5;
+  string protocol = 6;
+  string app_protocol = 7;
+  uint64 bytes = 8;
+  uint64 packets = 9;
+  int64 first_seen_unix_ms = 10;
+  int64 last_seen_unix_ms = 11;
+  uint32 vlan_id = 13;
+}
+
+message TCPMetrics {
+  int32 active_tcp_flows = 1;
+  int64 total_retransmits = 2;
+  int64 total_rsts = 3;
+  int64 total_zero_windows = 4;
+  int64 total_out_of_order = 5;
+  double rtt_avg_ms = 6;
+  double rtt_min_ms = 7;
+  double rtt_max_ms = 8;
+  int64 rtt_samples = 9;
+  int64 total_expected_pkts = 10;
+  int64 total_lost_pkts = 11;
+  double packet_loss_pct = 12;
+}
+
+message LatencyStats {
+  int32 samples = 1;
+  double avg_ms = 2;
+  double min_ms = 3;
+  double max_ms = 4;
+}
+
+message LatencySnapshot {
+  LatencyStats dns_latency = 1;
+  LatencyStats tls_latency = 2;
+  LatencyStats tcp_latency = 3;
+}
+
+message ProtocolStat {
+  string protocol = 1;
+  uint64 bytes = 2;
+  uint64 packets = 3;
+  double percentage = 4;
+}
+
+message InterceptRule {
+  string id = 1;
+  string name = 2;
+  string expression = 3;
+  string action = 4;
+  bool enabled = 5;
+}
+
+message InterceptConfigUpdate {
+  repeated string target_nodes = 1;
+  repeated InterceptRule rules = 2;
+}

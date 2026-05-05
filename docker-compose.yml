@@ -1,0 +1,22 @@
+services:
+  netgazer-server:
+    build: .
+    container_name: netgazer-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"    # HTTP API + WebSocket + Dashboard
+      - "50051:50051"  # gRPC (agent communication)
+    volumes:
+      - netgazer_data:/var/lib/netgazer
+      - ./deploy/nginx/gtopng.conf:/opt/netgazer/nginx.conf:ro  # optional nginx config reference
+    environment:
+      - TZ=Asia/Shanghai
+    command:
+      - "--http-port=8080"
+      - "--grpc-port=50051"
+      - "--db=/var/lib/netgazer/netgazer.db"
+      - "--geoip-country-db=/var/lib/netgazer/geoip/country.mmdb"
+      - "--geoip-asn-db=/var/lib/netgazer/geoip/asn.mmdb"
+
+volumes:
+  netgazer_data:

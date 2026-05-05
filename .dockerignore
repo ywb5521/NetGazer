@@ -1,0 +1,10 @@
+node_modules
+.git
+*.db
+*.db-journal
+*.log
+bin/
+frontend/dist/
+backend/bin/
+.gpt/
+.claude/
