@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"net"
 	"os"
 	"strings"
 )
@@ -29,7 +30,7 @@ func ParseAgentFlags() *AgentConfig {
 	flag.StringVar(&cfg.ServerAddr, "server-addr", "localhost:50051", "netgazer-server gRPC address")
 	flag.StringVar(&cfg.Interface, "interface", "", "Network interface to capture (deprecated: use --interfaces)")
 	var ifaces string
-	flag.StringVar(&ifaces, "interfaces", "eth0", "Network interfaces to capture (comma-separated)")
+	flag.StringVar(&ifaces, "interfaces", "", "Network interfaces to capture (comma-separated, default: auto-detect all)")
 	flag.StringVar(&cfg.NodeID, "node-id", hostname, "Agent node unique identifier")
 	flag.StringVar(&cfg.BPFFilter, "bpf-filter", "", "BPF capture filter")
 	flag.StringVar(&cfg.Tags, "tags", "", "Node tags (comma-separated)")
@@ -55,8 +56,29 @@ func ParseAgentFlags() *AgentConfig {
 		cfg.Interfaces = []string{cfg.Interface}
 	}
 	if len(cfg.Interfaces) == 0 {
-		cfg.Interfaces = []string{"eth0"}
+		cfg.Interfaces = discoverInterfaces()
 	}
 
 	return cfg
+}
+
+func discoverInterfaces() []string {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return []string{"eth0"}
+	}
+	var names []string
+	for _, iface := range interfaces {
+		if iface.Flags&net.FlagUp == 0 {
+			continue
+		}
+		if iface.Flags&net.FlagLoopback != 0 {
+			continue
+		}
+		names = append(names, iface.Name)
+	}
+	if len(names) == 0 {
+		return []string{"eth0"}
+	}
+	return names
 }
