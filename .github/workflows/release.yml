@@ -57,7 +57,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
         run: |
-          go build -ldflags="-s -w -extldflags '-Wl,-rpath,\$ORIGIN' -X main.version=${{ steps.version.outputs.value }}" \
+          go build -ldflags="-s -w -extldflags=-Wl,-rpath,\$ORIGIN,--disable-new-dtags -X main.version=${{ steps.version.outputs.value }}" \
             -o /tmp/out/netgazer-agent \
             ./cmd/agent
 
@@ -68,7 +68,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
         run: |
-          go build -ldflags="-s -w -extldflags '-Wl,-rpath,\$ORIGIN'" \
+          go build -ldflags="-s -w -extldflags=-Wl,-rpath,\$ORIGIN,--disable-new-dtags" \
             -o /tmp/out/netgazer-server \
             ./cmd/server
 
