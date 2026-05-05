@@ -42,6 +42,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libpcap-dev libndpi-dev
 
+      - name: Prepare static linking
+        run: |
+          # Remove .so symlinks so linker uses static .a for nDPI + its deps
+          sudo rm -f /usr/lib/*/libndpi.so /usr/lib/*/libndpi.so.*
+
       - name: Determine version
         id: version
         run: |
@@ -58,7 +63,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
         run: |
-          go build -ldflags="-s -w -X main.version=${{ steps.version.outputs.value }}" \
+          go build -ldflags="-s -w -linkmode external -extldflags '-l:libgcrypt.a -l:libgpg-error.a -lpcap -lm -lpthread -ldl' -X main.version=${{ steps.version.outputs.value }}" \
             -o /tmp/netgazer-agent-${{ steps.version.outputs.value }}-${{ matrix.os }} \
             ./cmd/agent
 
@@ -93,6 +98,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libpcap-dev libndpi-dev
 
+      - name: Prepare static linking
+        run: |
+          # Remove .so symlinks so linker uses static .a for nDPI + its deps
+          sudo rm -f /usr/lib/*/libndpi.so /usr/lib/*/libndpi.so.*
+
       - name: Determine version
         id: version
         run: |
@@ -109,7 +119,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
         run: |
-          go build -ldflags="-s -w" \
+          go build -ldflags="-s -w -linkmode external -extldflags '-l:libgcrypt.a -l:libgpg-error.a -lpcap -lm -lpthread -ldl'" \
             -o /tmp/netgazer-server-${{ steps.version.outputs.value }}-linux-${{ matrix.goarch }} \
             ./cmd/server
 
@@ -170,24 +180,6 @@ jobs:
             |--------|----------|
             | `netgazer-server-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz` | Linux x86_64 |
             | `netgazer-server-v${{ steps.version.outputs.value }}-linux-arm64.tar.gz` | Linux ARM64 |
-
-            ### Quick Install
-            ```bash
-            # Agent
-            wget https://github.com/gtopng/netgazer/releases/download/v${{ steps.version.outputs.value }}/netgazer-agent-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz
-            tar xzf netgazer-agent-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz
-            sudo ./netgazer-agent --server-addr <server>:50051 --interfaces eth0 --node-id $(hostname)
-
-            # Server
-            wget https://github.com/gtopng/netgazer/releases/download/v${{ steps.version.outputs.value }}/netgazer-server-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz
-            tar xzf netgazer-server-v${{ steps.version.outputs.value }}-linux-amd64.tar.gz
-            ./netgazer-server --http-port 8080 --grpc-port 50051
-            ```
-
-            ### Docker
-            ```bash
-            docker compose up -d
-            ```
           files: artifacts/*.tar.gz
           draft: false
           prerelease: false
