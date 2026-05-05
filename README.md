@@ -182,12 +182,17 @@ docker compose up -d
 ```bash
 tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
-
+```bash
 ./netgazer-agent \
   --server-addr <服务器IP>:50051 \
-  --interfaces eth0 \
   --node-id datacenter-1 \
   --tags production,rack-a
+```
+
+如果不指定 `--interfaces`，agent 会自动发现所有活跃的非 loopback 网卡（排除 `veth*`、`docker*`、`br-*` 等虚拟接口）。如需手动指定：
+
+```bash
+./netgazer-agent --server-addr <IP>:50051 --interfaces eth0,eth1 --node-id my-node
 ```
 
 ### 端口说明
@@ -197,7 +202,9 @@ sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
 | `9527` | HTTP/WebSocket | Dashboard 页面、REST API、WebSocket（经 nginx 代理） |
 | `50051` | gRPC | Agent 直连 Go Server（不经 nginx，需 L4 转发） |
 
-外层 HTTP 反代（1panel / 宝塔）只需反代 `9527` 端口。gRPC 端口 `50051` 需要 L4/TCP 层转发或直接暴露，因为 nginx 不支持非 TLS 的 HTTP/2 明文（h2c）升级。
+外层 HTTP 反代（1panel / 宝塔）只需反代 `9527` 端口。gRPC 端口 `50051` 需要 L4/TCP 层转发或直接暴露。
+
+Agent 默认使用 TLS 连接 gRPC 服务端（系统根证书验证）。当通过 Cloudflare CDN 等 L7 代理连接时，代理必须支持 HTTP/2 和 gRPC 透传。
 
 ### 开发模式
 
@@ -243,10 +250,11 @@ cd frontend && npm run dev
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--server-addr` | `localhost:50051` | gRPC server address |
-| `--interfaces` | `eth0` | Network interfaces to capture (comma-separated) |
+| `--interfaces` | *(auto)* | Network interfaces to capture (comma-separated, auto-detects all active non-loopback interfaces) |
 | `--node-id` | hostname | Unique node identifier |
 | `--bpf-filter` | — | BPF capture filter expression |
 | `--tags` | — | Comma-separated node tags |
+| `--snapshot-interval` | `1s` | Snapshot report interval (e.g. `5s`, `10s`, `1m`) |
 | `--proto-engine` | `ndpi` | Protocol detection: `ndpi`, `opengfw`, or `both` |
 | `--intercept` | `false` | Enable traffic interception on this agent |
 | `--tls-cert` / `--tls-key` / `--tls-ca` | — | TLS/mTLS for gRPC |
@@ -299,8 +307,10 @@ Docker 内部已包含 nginx，外部只需将域名反代到 `http://127.0.0.1:
 ```bash
 tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
-./netgazer-agent --server-addr <服务器IP>:50051 --interfaces eth0 --node-id my-node
+./netgazer-agent --server-addr <服务器IP>:50051 --node-id my-node
 ```
+若不指定 `--interfaces`，自动监听所有活跃网卡（排除虚拟接口）。
+
 
 systemd 服务（推荐）：
 
@@ -314,7 +324,6 @@ After=network.target
 Type=simple
 ExecStart=/opt/netgazer/bin/netgazer-agent \
   --server-addr mgmt-server:50051 \
-  --interfaces eth0 \
   --node-id %H
 Restart=always
 RestartSec=10
@@ -473,6 +482,18 @@ Approximately 50–100 MB/day for a busy network with ~50 hosts. Multi-tier aggr
 
 ~50 MB RSS with nDPI protocol detection on a typical host. Packet capture uses libpcap with kernel bypass where available. CPU usage scales with traffic volume — typically 2–5% on a 100 Mbps link.
 
+**Q: How do I adjust the agent's report frequency?**
+
+Use `--snapshot-interval` (default `1s`). For lower bandwidth consumption, set it to `5s`, `10s`, or `1m`. The server can also dynamically adjust this via gRPC config updates.
+
+**Q: Agent failed to start on eth0 — how do I fix it?**
+
+Agent now auto-detects all active non-loopback interfaces. Just omit `--interfaces` or specify the correct interface name. Virtual interfaces (`veth*`, `docker*`, `br-*`, `tun*`) are automatically excluded.
+
+**Q: Agent shows IPv6 connection errors or HTTP/2 preface errors?**
+
+Agent connects via TLS over IPv4 by default. If your DNS returns IPv6 addresses (e.g. Cloudflare CDN), the agent automatically resolves the hostname to IPv4 and connects. Ensure your gRPC server or CDN supports HTTP/2 + TLS and correctly proxies gRPC traffic (Cloudflare may block gRPC on certain plans).
+
 ---
 
 ## License
@@ -528,7 +549,7 @@ docker compose up -d
 ```bash
 tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
-./netgazer-agent --server-addr <服务器IP>:50051 --interfaces eth0 --node-id my-node
+./netgazer-agent --server-addr <服务器IP>:50051 --node-id my-node
 ```
 
 ### 端口说明
