@@ -40,7 +40,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpcap-dev libndpi-dev libdbus-1-dev libsystemd-dev libcap-dev liblzma-dev libzstd-dev liblz4-dev
+          sudo apt-get install -y libpcap-dev libndpi-dev libdbus-1-dev libsystemd-dev libcap-dev liblzma-dev libzstd-dev liblz4-dev libibverbs-dev
 
       - name: Prepare static linking
         run: |
@@ -63,7 +63,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
         run: |
-          go build -ldflags="-s -w -linkmode external -extldflags '-Wl,--push-state,-Bstatic -lndpi -lgcrypt -lgpg-error -lpcap -ldbus-1 -Wl,--pop-state,-Bdynamic -lsystemd -lcap -llzma -lzstd -llz4 -lm -lpthread -ldl -lrt' -X main.version=${{ steps.version.outputs.value }}" \
+          go build -ldflags="-s -w -linkmode external -extldflags '-Wl,--push-state,-Bstatic -lndpi -lgcrypt -lgpg-error -lpcap -ldbus-1 -libverbs -Wl,--pop-state,-Bdynamic -lsystemd -lcap -llzma -lzstd -llz4 -lm -lpthread -ldl -lrt' -X main.version=${{ steps.version.outputs.value }}" \
             -o /tmp/netgazer-agent-${{ steps.version.outputs.value }}-${{ matrix.os }} \
             ./cmd/agent
 
@@ -96,7 +96,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpcap-dev libndpi-dev libdbus-1-dev libsystemd-dev libcap-dev liblzma-dev libzstd-dev liblz4-dev
+          sudo apt-get install -y libpcap-dev libndpi-dev libdbus-1-dev libsystemd-dev libcap-dev liblzma-dev libzstd-dev liblz4-dev libibverbs-dev
 
       - name: Prepare static linking
         run: |
@@ -119,7 +119,7 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 1
         run: |
-          go build -ldflags="-s -w -linkmode external -extldflags '-Wl,--push-state,-Bstatic -lndpi -lgcrypt -lgpg-error -lpcap -ldbus-1 -Wl,--pop-state,-Bdynamic -lsystemd -lcap -llzma -lzstd -llz4 -lm -lpthread -ldl -lrt'" \
+          go build -ldflags="-s -w -linkmode external -extldflags '-Wl,--push-state,-Bstatic -lndpi -lgcrypt -lgpg-error -lpcap -ldbus-1 -libverbs -Wl,--pop-state,-Bdynamic -lsystemd -lcap -llzma -lzstd -llz4 -lm -lpthread -ldl -lrt'" \
             -o /tmp/netgazer-server-${{ steps.version.outputs.value }}-linux-${{ matrix.goarch }} \
             ./cmd/server
 
