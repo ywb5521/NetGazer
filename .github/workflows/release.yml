@@ -40,7 +40,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpcap-dev
+          sudo apt-get install -y libpcap-dev libndpi-dev
 
       - name: Determine version
         id: version
@@ -91,7 +91,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpcap-dev
+          sudo apt-get install -y libpcap-dev libndpi-dev
 
       - name: Determine version
         id: version
