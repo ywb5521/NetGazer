@@ -30,27 +30,27 @@ COPY frontend/ .
 RUN npm run build
 
 # ============================================================
-# Stage 3: Runtime
+# Stage 3: Runtime (nginx + Go server, 单容器)
 # ============================================================
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libpcap0.8 libndpi4.2 ca-certificates tzdata \
+    nginx supervisor \
     && rm -rf /var/lib/apt/lists/* \
-    && adduser --system --group --home /var/lib/netgazer --no-create-home netgazer
+    && adduser --system --group --home /var/lib/netgazer --no-create-home netgazer \
+    && mkdir -p /var/log/supervisor /run/nginx \
+    && chown netgazer:netgazer /var/log/supervisor
 
 COPY --from=backend-builder /out/netgazer-server /usr/local/bin/netgazer-server
 COPY --from=frontend-builder /src/dist /opt/netgazer/frontend/dist
+COPY deploy/nginx/netgazer-docker.conf /etc/nginx/conf.d/default.conf
+COPY deploy/supervisord.conf /etc/supervisor/conf.d/netgazer.conf
 
 RUN mkdir -p /var/lib/netgazer/geoip && \
     chown -R netgazer:netgazer /var/lib/netgazer /opt/netgazer
 
-USER netgazer
-EXPOSE 8080 50051
+EXPOSE 9527
 VOLUME ["/var/lib/netgazer"]
 
-ENTRYPOINT ["netgazer-server"]
-CMD ["--http-port", "8080", \
-     "--grpc-port", "50051", \
-     "--db", "/var/lib/netgazer/netgazer.db", \
-     "--web-dir", "/opt/netgazer/frontend/dist"]
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
