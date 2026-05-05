@@ -4,7 +4,7 @@
 FROM golang:1.24-bookworm AS backend-builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libpcap-dev libndpi-dev libdbus-1-dev libsystemd-dev libcap-dev liblzma-dev libzstd-dev liblz4-dev \
+    libpcap-dev libndpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /src
@@ -12,8 +12,7 @@ COPY backend/go.mod backend/go.sum ./
 RUN go mod download
 
 COPY backend/ .
-RUN rm -f /usr/lib/*/libndpi.so* /usr/lib/*/libpcap.so* /usr/lib/*/libdbus-1.so* && \
-    CGO_ENABLED=1 go build -ldflags="-s -w -linkmode external -extldflags '-Wl,--push-state,-Bstatic -lndpi -lgcrypt -lgpg-error -lpcap -ldbus-1 -Wl,--pop-state,-Bdynamic -lsystemd -lcap -llzma -lzstd -llz4 -lm -lpthread -ldl -lrt'" -o /out/netgazer-server ./cmd/server
+RUN CGO_ENABLED=1 go build -ldflags="-s -w" -o /out/netgazer-server ./cmd/server
 
 # ============================================================
 # Stage 2: Build frontend
@@ -33,7 +32,7 @@ RUN npm run build
 FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates tzdata \
+    libpcap0.8 libndpi4.2 ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/* \
     && adduser --system --home /var/lib/netgazer --no-create-home netgazer
 
