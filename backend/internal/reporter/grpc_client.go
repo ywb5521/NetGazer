@@ -74,6 +74,10 @@ func NewGRPCClient(serverAddr, nodeID string, pipes []*IfacePipe, version string
 func (c *GRPCClient) Connect(ctx context.Context) error {
 	var opts []grpc.DialOption
 
+	// Passthrough bypasses gRPC's built-in DNS resolver so we can force
+	// IPv4-only resolution in the custom dialer below.
+	target := "passthrough:///" + c.serverAddr
+
 	// Force IPv4 DNS + dial to avoid IPv6 addresses (e.g. Cloudflare CDN
 	// AAAA records) when the host has no IPv6 routing.
 	opts = append(opts, grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
@@ -89,7 +93,7 @@ func (c *GRPCClient) Connect(ctx context.Context) error {
 			return nil, fmt.Errorf("no IPv4 address found for %s", host)
 		}
 		d := net.Dialer{}
-		return d.DialContext(ctx, "tcp4", net.JoinHostPort(ips[0].String(), port))
+		return d.DialContext(ctx, "tcp", net.JoinHostPort(ips[0].String(), port))
 	}))
 
 	if c.tlsCA != "" || (c.tlsCert != "" && c.tlsKey != "") {
@@ -122,7 +126,7 @@ func (c *GRPCClient) Connect(ctx context.Context) error {
 		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
 
-	conn, err := grpc.NewClient(c.serverAddr, opts...)
+	conn, err := grpc.NewClient(target, opts...)
 	if err != nil {
 		return fmt.Errorf("dial: %w", err)
 	}
