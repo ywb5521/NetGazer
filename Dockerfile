@@ -39,15 +39,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx supervisor \
     && rm -rf /var/lib/apt/lists/* \
     && adduser --system --group --home /var/lib/netgazer --no-create-home netgazer \
-    && mkdir -p /var/log/supervisor /run/nginx \
-    && chown netgazer:netgazer /var/log/supervisor
+    && mkdir -p /run/nginx
 
 COPY --from=backend-builder /out/netgazer-server /usr/local/bin/netgazer-server
 COPY --from=frontend-builder /src/dist /opt/netgazer/frontend/dist
 COPY deploy/nginx/netgazer-docker.conf /etc/nginx/conf.d/default.conf
-COPY deploy/supervisord.conf /etc/supervisor/conf.d/netgazer.conf
+COPY deploy/supervisord.conf /etc/supervisor/supervisord.conf
 
-RUN mkdir -p /var/lib/netgazer/geoip && \
+RUN rm -f /etc/nginx/sites-enabled/default && \
+    mkdir -p /var/lib/netgazer/geoip && \
     chown -R netgazer:netgazer /var/lib/netgazer /opt/netgazer
 
 EXPOSE 9527

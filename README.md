@@ -120,14 +120,13 @@ Alerts are deduplicated with configurable cooldown and forwarded to notification
            │ REST API     │ WebSocket    │ Static files
            ▼              ▼              ▼
     ┌──────────────────────────────────────────┐
-    │          nginx (Docker container)         │
-    │     Port 9527: HTTP + WS + Frontend       │
-    │     Port 50051: HTTP/2 gRPC proxy         │
-    └──────┬────────────────┬───────────────────┘
-           │                │
-           ▼                ▼
+    │        nginx + Go Server (Docker)          │
+    │     Port 9527: HTTP + WS + gRPC            │
+    └──────────────────┬───────────────────────────┘
+                       │
+                       ▼
     ┌──────────────────────────────────────────────┐
-    │           NetGazer Server (Docker)            │
+    │           NetGazer Server                    │
     │     (with built-in static file serving)       │
     │  ┌─────────┐ ┌──────────┐ ┌───────────────┐  │
     │  │ HTTP    │ │ WebSocket│ │ Alert Engine   │  │
@@ -145,7 +144,7 @@ Alerts are deduplicated with configurable cooldown and forwarded to notification
     │  └────────────────────────────────────────┘  │
     │                   │                          │
     │  ┌────────────────┴───────────────────────┐  │
-    │  │     gRPC Receiver  (:50051)            │  │
+    │  │     gRPC Receiver  (:50051, internal)   │  │
     │  └────────────────┬───────────────────────┘  │
     └───────────────────┼──────────────────────────┘
                         │ gRPC (bidirectional stream)
@@ -185,7 +184,7 @@ tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
 
 ./netgazer-agent \
-  --server-addr <服务器IP>:50051 \
+  --server-addr <服务器IP>:9527 \
   --interfaces eth0 \
   --node-id datacenter-1 \
   --tags production,rack-a
@@ -193,15 +192,7 @@ sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
 
 ### 端口说明
 
-| 端口 | 协议 | 用途 | 外部访问 |
-|------|------|------|----------|
-| `9527` | HTTP/1.1 | Dashboard + API + WebSocket | 浏览器访问 `http://<IP>:9527` |
-| `50051` | HTTP/2 (gRPC) | Agent 连接 | Agent 通过 `--server-addr <IP>:50051` 连接 |
-
-如果外面还有一层反向代理（如 1panel / 宝塔）：
-
-- **9527 端口**：普通 HTTP 反代即可访问页面
-- **50051 端口**：gRPC 走 HTTP/2，外层反代需要用 **L4 TCP 代理**模式，不能用 HTTP 反向代理
+只暴露一个端口 `9527`，同时支持 HTTP 和 gRPC（通过 HTTP/2 路径区分）。外层反代（1panel / 宝塔）只需反代这一个端口即可。
 
 ### 开发模式
 
@@ -286,17 +277,15 @@ docker compose up -d
 **加载 GeoIP 数据库（可选）：**
 
 ```bash
-docker cp Geolite2-Country.mmdb netgazer-server:/var/lib/netgazer/geoip/country.mmdb
-docker cp Geolite2-ASN.mmdb netgazer-server:/var/lib/netgazer/geoip/asn.mmdb
+docker cp Geolite2-Country.mmdb netgazer:/var/lib/netgazer/geoip/country.mmdb
+docker cp Geolite2-ASN.mmdb netgazer:/var/lib/netgazer/geoip/asn.mmdb
 ```
 
 或者挂载本地目录到 compose 的 `netgazer_data` volume。
 
 **外层反代（如 1panel / 宝塔）：**
 
-Docker 内部已经做了 nginx 反代，外部如果需要绑定域名：
-- **HTTP（9527）**：普通反代即可，目标是 `http://127.0.0.1:9527`
-- **gRPC（50051）**：Agent 连接的端口，外层反代需要使用 **L4 TCP 代理**模式（不能是 HTTP 反代），目标 `127.0.0.1:50051`
+Docker 内部已包含 nginx，外部只需将域名反代到 `http://127.0.0.1:9527` 即可。gRPC 和 HTTP 共用一个端口，通过 HTTP/2 自动区分，不需要额外配置。
 
 ### Agent（在受监控的机器上）
 
@@ -305,7 +294,7 @@ Docker 内部已经做了 nginx 反代，外部如果需要绑定域名：
 ```bash
 tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
-./netgazer-agent --server-addr <服务器IP>:50051 --interfaces eth0 --node-id my-node
+./netgazer-agent --server-addr <服务器IP>:9527 --interfaces eth0 --node-id my-node
 ```
 
 systemd 服务（推荐）：
@@ -319,7 +308,7 @@ After=network.target
 [Service]
 Type=simple
 ExecStart=/opt/netgazer/bin/netgazer-agent \
-  --server-addr mgmt-server:50051 \
+  --server-addr mgmt-server:9527 \
   --interfaces eth0 \
   --node-id %H
 Restart=always
@@ -469,7 +458,7 @@ Add internal subnets to the whitelist or increase the bandwidth/flood thresholds
 
 **Q: Can I run the agent on a different machine from the server?**
 
-Yes. The agent connects to the server via gRPC (`--server-addr`). Make sure the gRPC port (default 50051) is reachable from the agent machine. For production, enable TLS with `--tls-cert` and `--tls-key`.
+Yes. The agent connects to the server via gRPC (`--server-addr <server-ip>:9527`). Docker only exposes port 9527 which handles both HTTP and gRPC traffic.
 
 **Q: How much data does the SQLite database grow per day?**
 
@@ -534,15 +523,12 @@ docker compose up -d
 ```bash
 tar xzf netgazer-agent-*-linux-amd64.tar.gz
 sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
-./netgazer-agent --server-addr <服务器IP>:50051 --interfaces eth0 --node-id my-node
+./netgazer-agent --server-addr <服务器IP>:9527 --interfaces eth0 --node-id my-node
 ```
 
 ### 端口说明
 
-| 端口 | 协议 | 用途 | 外部访问 |
-|------|------|------|----------|
-| `9527` | HTTP | Dashboard + API + WebSocket | 普通 HTTP 反代 |
-| `50051` | HTTP/2 (gRPC) | Agent 连接 | **L4 TCP 代理**（不是 HTTP 反代） |
+只暴露一个端口 `9527`，同时支持 HTTP 和 gRPC（HTTP/2 路径区分）。外层反代只需反代这一个端口。
 
 ### GeoIP 数据库
 
@@ -552,4 +538,4 @@ sudo setcap cap_net_raw,cap_net_admin=eip ./netgazer-agent
 
 ### 部署
 
-Server 仅支持 Docker 部署：`docker compose up -d` 一键启动，Dashboard → `http://localhost:9527`。Docker 内部已包含 nginx 反代，外部只需映射 9527（HTTP）和 50051（gRPC）两个端口。
+Server 仅支持 Docker 部署：`docker compose up -d` 一键启动，Dashboard → `http://localhost:9527`。Docker 内部已包含 nginx，单个端口 9527 同时承载 HTTP 页面和 gRPC Agent 连接。
