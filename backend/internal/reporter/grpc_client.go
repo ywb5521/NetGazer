@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net"
 	"os"
 	"time"
 
@@ -72,6 +73,13 @@ func NewGRPCClient(serverAddr, nodeID string, pipes []*IfacePipe, version string
 
 func (c *GRPCClient) Connect(ctx context.Context) error {
 	var opts []grpc.DialOption
+
+	// Force IPv4 to avoid "cannot assign requested address" when DNS returns
+	// IPv6 addresses (e.g. Cloudflare CDN) but the host has no IPv6 routing.
+	opts = append(opts, grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+		d := net.Dialer{}
+		return d.DialContext(ctx, "tcp4", addr)
+	}))
 
 	if c.tlsCA != "" || (c.tlsCert != "" && c.tlsKey != "") {
 		tlsCfg := &tls.Config{}
