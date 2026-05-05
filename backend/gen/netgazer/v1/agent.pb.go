@@ -1519,7 +1519,7 @@ var File_netgazer_v1_agent_proto protoreflect.FileDescriptor
 
 const file_netgazer_v1_agent_proto_rawDesc = "" +
 	"\n" +
-	"\x15netgazer/v1/agent.proto\x12\tnetgazer.v1\"\xb5\x01\n" +
+	"\x17netgazer/v1/agent.proto\x12\vnetgazer.v1\"\xb5\x01\n" +
 	"\x0fRegisterRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x1c\n" +
 	"\tinterface\x18\x02 \x01(\tR\tinterface\x12\x18\n" +
@@ -1533,23 +1533,23 @@ const file_netgazer_v1_agent_proto_rawDesc = "" +
 	"\x10RegisterResponse\x12\x1a\n" +
 	"\baccepted\x18\x01 \x01(\bR\baccepted\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x120\n" +
-	"\x14snapshot_interval_ms\x18\x03 \x01(\x05R\x12snapshotIntervalMs\"\xd5\x04\n" +
+	"\x14snapshot_interval_ms\x18\x03 \x01(\x05R\x12snapshotIntervalMs\"\xe7\x04\n" +
 	"\fAgentMessage\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12*\n" +
-	"\x11timestamp_unix_ms\x18\x02 \x01(\x03R\x0ftimestampUnixMs\x126\n" +
-	"\bsnapshot\x18\x03 \x01(\v2\x1a.netgazer.v1.TrafficSnapshotR\bsnapshot\x12%\n" +
-	"\x05hosts\x18\x04 \x03(\v2\x0f.netgazer.v1.HostR\x05hosts\x12%\n" +
-	"\x05flows\x18\x05 \x03(\v2\x0f.netgazer.v1.FlowR\x05flows\x125\n" +
-	"\tprotocols\x18\x06 \x03(\v2\x17.netgazer.v1.ProtocolStatR\tprotocols\x124\n" +
-	"\vdns_queries\x18\a \x03(\v2\x13.netgazer.v1.DNSQueryR\n" +
-	"dnsQueries\x12C\n" +
-	"\x10packet_size_dist\x18\b \x01(\v2\x19.netgazer.v1.PacketSizeDistR\x0epacketSizeDist\x12<\n" +
-	"\rsystem_health\x18\t \x01(\v2\x17.netgazer.v1.SystemHealthR\fsystemHealth\x12\x1c\n" +
+	"\x11timestamp_unix_ms\x18\x02 \x01(\x03R\x0ftimestampUnixMs\x128\n" +
+	"\bsnapshot\x18\x03 \x01(\v2\x1c.netgazer.v1.TrafficSnapshotR\bsnapshot\x12'\n" +
+	"\x05hosts\x18\x04 \x03(\v2\x11.netgazer.v1.HostR\x05hosts\x12'\n" +
+	"\x05flows\x18\x05 \x03(\v2\x11.netgazer.v1.FlowR\x05flows\x127\n" +
+	"\tprotocols\x18\x06 \x03(\v2\x19.netgazer.v1.ProtocolStatR\tprotocols\x126\n" +
+	"\vdns_queries\x18\a \x03(\v2\x15.netgazer.v1.DNSQueryR\n" +
+	"dnsQueries\x12E\n" +
+	"\x10packet_size_dist\x18\b \x01(\v2\x1b.netgazer.v1.PacketSizeDistR\x0epacketSizeDist\x12>\n" +
+	"\rsystem_health\x18\t \x01(\v2\x19.netgazer.v1.SystemHealthR\fsystemHealth\x12\x1c\n" +
 	"\tinterface\x18\n" +
-	" \x01(\tR\tinterface\x126\n" +
-	"\vtcp_metrics\x18\v \x01(\v2\x15.netgazer.v1.TCPMetricsR\n" +
-	"tcpMetrics\x124\n" +
-	"\alatency\x18\f \x01(\v2\x1a.netgazer.v1.LatencySnapshotR\alatency\"\x97\x02\n" +
+	" \x01(\tR\tinterface\x128\n" +
+	"\vtcp_metrics\x18\v \x01(\v2\x17.netgazer.v1.TCPMetricsR\n" +
+	"tcpMetrics\x126\n" +
+	"\alatency\x18\f \x01(\v2\x1c.netgazer.v1.LatencySnapshotR\alatency\"\x97\x02\n" +
 	"\fSystemHealth\x12\x1f\n" +
 	"\vcpu_percent\x18\x01 \x01(\x01R\n" +
 	"cpuPercent\x12\x1f\n" +
@@ -1575,11 +1575,11 @@ const file_netgazer_v1_agent_proto_rawDesc = "" +
 	"\tsize_1024\x18\x05 \x01(\x04R\bsize1024\x12\x1b\n" +
 	"\tsize_1500\x18\x06 \x01(\x04R\bsize1500\x12\x1f\n" +
 	"\vsize_gt1500\x18\a \x01(\x04R\n" +
-	"sizeGt1500\"\xcd\x01\n" +
-	"\rServerMessage\x12\"\n" +
-	"\x03ack\x18\x01 \x01(\v2\x0e.netgazer.v1.AckH\x00R\x03ack\x12>\n" +
-	"\rconfig_update\x18\x02 \x01(\v2\x17.netgazer.v1.ConfigUpdateH\x00R\fconfigUpdate\x12M\n" +
-	"\x10intercept_update\x18\x03 \x01(\v2 .netgazer.v1.InterceptConfigUpdateH\x00R\x0finterceptUpdateB\t\n" +
+	"sizeGt1500\"\xd3\x01\n" +
+	"\rServerMessage\x12$\n" +
+	"\x03ack\x18\x01 \x01(\v2\x10.netgazer.v1.AckH\x00R\x03ack\x12@\n" +
+	"\rconfig_update\x18\x02 \x01(\v2\x19.netgazer.v1.ConfigUpdateH\x00R\fconfigUpdate\x12O\n" +
+	"\x10intercept_update\x18\x03 \x01(\v2\".netgazer.v1.InterceptConfigUpdateH\x00R\x0finterceptUpdateB\t\n" +
 	"\amessage\"B\n" +
 	"\x03Ack\x12;\n" +
 	"\x1areceived_timestamp_unix_ms\x18\x01 \x01(\x03R\x17receivedTimestampUnixMs\"f\n" +
@@ -1644,13 +1644,13 @@ const file_netgazer_v1_agent_proto_rawDesc = "" +
 	"\asamples\x18\x01 \x01(\x05R\asamples\x12\x15\n" +
 	"\x06avg_ms\x18\x02 \x01(\x01R\x05avgMs\x12\x15\n" +
 	"\x06min_ms\x18\x03 \x01(\x01R\x05minMs\x12\x15\n" +
-	"\x06max_ms\x18\x04 \x01(\x01R\x05maxMs\"\xbf\x01\n" +
-	"\x0fLatencySnapshot\x128\n" +
-	"\vdns_latency\x18\x01 \x01(\v2\x17.netgazer.v1.LatencyStatsR\n" +
-	"dnsLatency\x128\n" +
-	"\vtls_latency\x18\x02 \x01(\v2\x17.netgazer.v1.LatencyStatsR\n" +
-	"tlsLatency\x128\n" +
-	"\vtcp_latency\x18\x03 \x01(\v2\x17.netgazer.v1.LatencyStatsR\n" +
+	"\x06max_ms\x18\x04 \x01(\x01R\x05maxMs\"\xc5\x01\n" +
+	"\x0fLatencySnapshot\x12:\n" +
+	"\vdns_latency\x18\x01 \x01(\v2\x19.netgazer.v1.LatencyStatsR\n" +
+	"dnsLatency\x12:\n" +
+	"\vtls_latency\x18\x02 \x01(\v2\x19.netgazer.v1.LatencyStatsR\n" +
+	"tlsLatency\x12:\n" +
+	"\vtcp_latency\x18\x03 \x01(\v2\x19.netgazer.v1.LatencyStatsR\n" +
 	"tcpLatency\"z\n" +
 	"\fProtocolStat\x12\x1a\n" +
 	"\bprotocol\x18\x01 \x01(\tR\bprotocol\x12\x14\n" +
@@ -1666,13 +1666,13 @@ const file_netgazer_v1_agent_proto_rawDesc = "" +
 	"expression\x18\x03 \x01(\tR\n" +
 	"expression\x12\x16\n" +
 	"\x06action\x18\x04 \x01(\tR\x06action\x12\x18\n" +
-	"\aenabled\x18\x05 \x01(\bR\aenabled\"j\n" +
+	"\aenabled\x18\x05 \x01(\bR\aenabled\"l\n" +
 	"\x15InterceptConfigUpdate\x12!\n" +
-	"\ftarget_nodes\x18\x01 \x03(\tR\vtargetNodes\x12.\n" +
-	"\x05rules\x18\x02 \x03(\v2\x18.netgazer.v1.InterceptRuleR\x05rules2\x9d\x01\n" +
-	"\fAgentService\x12C\n" +
-	"\bRegister\x12\x1a.netgazer.v1.RegisterRequest\x1a\x1b.netgazer.v1.RegisterResponse\x12H\n" +
-	"\x0fStreamSnapshots\x12\x17.netgazer.v1.AgentMessage\x1a\x18.netgazer.v1.ServerMessage(\x010\x01B2Z0github.com/netgazer/backend/gen/netgazer/v1;netgazerv1b\x06proto3"
+	"\ftarget_nodes\x18\x01 \x03(\tR\vtargetNodes\x120\n" +
+	"\x05rules\x18\x02 \x03(\v2\x1a.netgazer.v1.InterceptRuleR\x05rules2\xa5\x01\n" +
+	"\fAgentService\x12G\n" +
+	"\bRegister\x12\x1c.netgazer.v1.RegisterRequest\x1a\x1d.netgazer.v1.RegisterResponse\x12L\n" +
+	"\x0fStreamSnapshots\x12\x19.netgazer.v1.AgentMessage\x1a\x1a.netgazer.v1.ServerMessage(\x010\x01B8Z6github.com/netgazer/backend/gen/netgazer/v1;netgazerv1b\x06proto3"
 
 var (
 	file_netgazer_v1_agent_proto_rawDescOnce sync.Once
