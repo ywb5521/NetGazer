@@ -36,7 +36,7 @@ type LatencyTracker struct {
 func NewLatencyTracker() *LatencyTracker {
 	return &LatencyTracker{
 		dnsPending:    make(map[uint16]time.Time),
-		tlsHandshakes:  make(map[string]time.Time),
+		tlsHandshakes: make(map[string]time.Time),
 		tcpHandshakes: make(map[string]time.Time),
 		maxSamples:    256,
 	}

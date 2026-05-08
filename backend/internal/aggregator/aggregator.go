@@ -48,9 +48,9 @@ func (ns *nodeState) getOrCreateIface(name string) *ifaceState {
 		return is
 	}
 	is := &ifaceState{
-		Name:  name,
-		Hosts: make(map[string]*models.Host),
-		Flows: make(map[string]*models.Flow),
+		Name:      name,
+		Hosts:     make(map[string]*models.Host),
+		Flows:     make(map[string]*models.Flow),
 		Protocols: make(map[string]*models.ProtocolStat),
 	}
 	ns.ifaces[name] = is
@@ -148,12 +148,12 @@ func (is *ifaceState) UpdateFrom(nodeID string, msg *netgazerv1.AgentMessage) {
 			existing.Packets += p.Packets
 		} else {
 			is.Protocols[p.Protocol] = &models.ProtocolStat{
-				Protocol:  p.Protocol,
-				Bytes:     p.Bytes,
-				Packets:   p.Packets,
+				Protocol:   p.Protocol,
+				Bytes:      p.Bytes,
+				Packets:    p.Packets,
 				Percentage: p.Percentage,
-				NodeID:    nodeID,
-				Interface: is.Name,
+				NodeID:     nodeID,
+				Interface:  is.Name,
 			}
 		}
 	}
@@ -192,29 +192,29 @@ func (is *ifaceState) UpdateFrom(nodeID string, msg *netgazerv1.AgentMessage) {
 		is.PacketSizeDist.SizeGt1500 += msg.PacketSizeDist.SizeGt1500
 	}
 
-		if msg.TcpMetrics != nil {
-			is.TCPMetrics = &models.TCPMetricsJSON{
-				ActiveTCPFlows:   int(msg.TcpMetrics.ActiveTcpFlows),
-				TotalRetransmits: msg.TcpMetrics.TotalRetransmits,
-				TotalRSTs:        msg.TcpMetrics.TotalRsts,
-				TotalZeroWindows: msg.TcpMetrics.TotalZeroWindows,
-				TotalOutOfOrder:  msg.TcpMetrics.TotalOutOfOrder,
-				RTTAvgMS:         msg.TcpMetrics.RttAvgMs,
-					RTTMinMS:          msg.TcpMetrics.RttMinMs,
-					RTTMaxMS:          msg.TcpMetrics.RttMaxMs,
-					RTTSamples:        msg.TcpMetrics.RttSamples,
-					TotalExpectedPkts: msg.TcpMetrics.TotalExpectedPkts,
-					TotalLostPkts:     msg.TcpMetrics.TotalLostPkts,
-					PacketLossPct:     msg.TcpMetrics.PacketLossPct,
-			}
+	if msg.TcpMetrics != nil {
+		is.TCPMetrics = &models.TCPMetricsJSON{
+			ActiveTCPFlows:    int(msg.TcpMetrics.ActiveTcpFlows),
+			TotalRetransmits:  msg.TcpMetrics.TotalRetransmits,
+			TotalRSTs:         msg.TcpMetrics.TotalRsts,
+			TotalZeroWindows:  msg.TcpMetrics.TotalZeroWindows,
+			TotalOutOfOrder:   msg.TcpMetrics.TotalOutOfOrder,
+			RTTAvgMS:          msg.TcpMetrics.RttAvgMs,
+			RTTMinMS:          msg.TcpMetrics.RttMinMs,
+			RTTMaxMS:          msg.TcpMetrics.RttMaxMs,
+			RTTSamples:        msg.TcpMetrics.RttSamples,
+			TotalExpectedPkts: msg.TcpMetrics.TotalExpectedPkts,
+			TotalLostPkts:     msg.TcpMetrics.TotalLostPkts,
+			PacketLossPct:     msg.TcpMetrics.PacketLossPct,
 		}
+	}
 }
 
 type Aggregator struct {
-	mu           sync.RWMutex
-	nodes        map[string]*nodeState
-	bpfFilter    string
-	voipTracker  *voipTrackerHolder
+	mu          sync.RWMutex
+	nodes       map[string]*nodeState
+	bpfFilter   string
+	voipTracker *voipTrackerHolder
 }
 
 type voipTrackerHolder struct {
@@ -435,11 +435,11 @@ func (a *Aggregator) IngestFlowRecords(records []FlowRecord) {
 
 		// Track flows
 		fk := flowKey{
-			nodeID:  r.NodeID,
-			srcIP:   r.SrcIP.String(),
-			dstIP:   r.DstIP.String(),
-			srcPort: r.SrcPort,
-			dstPort: r.DstPort,
+			nodeID:   r.NodeID,
+			srcIP:    r.SrcIP.String(),
+			dstIP:    r.DstIP.String(),
+			srcPort:  r.SrcPort,
+			dstPort:  r.DstPort,
 			protocol: r.Protocol,
 		}
 		if f, ok := flowMap[fk]; ok {
@@ -560,11 +560,11 @@ func (a *Aggregator) IngestSNMP(snap SNMPDeviceSnapshot) {
 	ns, ok := a.nodes[snap.NodeID]
 	if !ok {
 		ns = &nodeState{
-			NodeID: snap.NodeID,
-			Tags:   []string{"snmp"},
+			NodeID:  snap.NodeID,
+			Tags:    []string{"snmp"},
 			Version: "snmp",
-			Online: true,
-			ifaces: make(map[string]*ifaceState),
+			Online:  true,
+			ifaces:  make(map[string]*ifaceState),
 		}
 		a.nodes[snap.NodeID] = ns
 	}
@@ -740,32 +740,32 @@ func (a *Aggregator) GlobalSnapshot() *models.GlobalSnapshot {
 				}
 			}
 
-				if is.TCPMetrics != nil {
-					if globalTCP == nil {
-						globalTCP = &models.TCPMetricsJSON{}
-					}
-					globalTCP.ActiveTCPFlows += is.TCPMetrics.ActiveTCPFlows
-					globalTCP.TotalRetransmits += is.TCPMetrics.TotalRetransmits
-					globalTCP.TotalRSTs += is.TCPMetrics.TotalRSTs
-					globalTCP.TotalZeroWindows += is.TCPMetrics.TotalZeroWindows
-					globalTCP.TotalOutOfOrder += is.TCPMetrics.TotalOutOfOrder
-					globalTCP.TotalExpectedPkts += is.TCPMetrics.TotalExpectedPkts
-					globalTCP.TotalLostPkts += is.TCPMetrics.TotalLostPkts
-					globalTCP.PacketLossPct = is.TCPMetrics.PacketLossPct
-					globalTCP.RTTSamples += is.TCPMetrics.RTTSamples
-					if is.TCPMetrics.RTTMinMS > 0 && (globalTCP.RTTMinMS == 0 || is.TCPMetrics.RTTMinMS < globalTCP.RTTMinMS) {
-						globalTCP.RTTMinMS = is.TCPMetrics.RTTMinMS
-					}
-					if is.TCPMetrics.RTTMaxMS > globalTCP.RTTMaxMS {
-						globalTCP.RTTMaxMS = is.TCPMetrics.RTTMaxMS
-					}
-					if globalTCP.TotalExpectedPkts > 0 {
-						globalTCP.PacketLossPct = float64(globalTCP.TotalLostPkts) / float64(globalTCP.TotalExpectedPkts) * 100
-					}
-					if is.TCPMetrics.RTTAvgMS > 0 && is.TCPMetrics.RTTSamples > 0 {
-						globalTCP.RTTAvgMS = (globalTCP.RTTAvgMS*float64(globalTCP.RTTSamples-is.TCPMetrics.RTTSamples) + is.TCPMetrics.RTTAvgMS*float64(is.TCPMetrics.RTTSamples)) / float64(globalTCP.RTTSamples)
-					}
+			if is.TCPMetrics != nil {
+				if globalTCP == nil {
+					globalTCP = &models.TCPMetricsJSON{}
 				}
+				globalTCP.ActiveTCPFlows += is.TCPMetrics.ActiveTCPFlows
+				globalTCP.TotalRetransmits += is.TCPMetrics.TotalRetransmits
+				globalTCP.TotalRSTs += is.TCPMetrics.TotalRSTs
+				globalTCP.TotalZeroWindows += is.TCPMetrics.TotalZeroWindows
+				globalTCP.TotalOutOfOrder += is.TCPMetrics.TotalOutOfOrder
+				globalTCP.TotalExpectedPkts += is.TCPMetrics.TotalExpectedPkts
+				globalTCP.TotalLostPkts += is.TCPMetrics.TotalLostPkts
+				globalTCP.PacketLossPct = is.TCPMetrics.PacketLossPct
+				globalTCP.RTTSamples += is.TCPMetrics.RTTSamples
+				if is.TCPMetrics.RTTMinMS > 0 && (globalTCP.RTTMinMS == 0 || is.TCPMetrics.RTTMinMS < globalTCP.RTTMinMS) {
+					globalTCP.RTTMinMS = is.TCPMetrics.RTTMinMS
+				}
+				if is.TCPMetrics.RTTMaxMS > globalTCP.RTTMaxMS {
+					globalTCP.RTTMaxMS = is.TCPMetrics.RTTMaxMS
+				}
+				if globalTCP.TotalExpectedPkts > 0 {
+					globalTCP.PacketLossPct = float64(globalTCP.TotalLostPkts) / float64(globalTCP.TotalExpectedPkts) * 100
+				}
+				if is.TCPMetrics.RTTAvgMS > 0 && is.TCPMetrics.RTTSamples > 0 {
+					globalTCP.RTTAvgMS = (globalTCP.RTTAvgMS*float64(globalTCP.RTTSamples-is.TCPMetrics.RTTSamples) + is.TCPMetrics.RTTAvgMS*float64(is.TCPMetrics.RTTSamples)) / float64(globalTCP.RTTSamples)
+				}
+			}
 		}
 
 		firstIface := ""
@@ -949,34 +949,34 @@ func (a *Aggregator) PaginatedFlows(nodeID, iface, search, protoFilter, appFilte
 				continue
 			}
 			for _, flow := range is.Flows {
-			fj := flow.ToJSON()
-			if seen[fj.ID] {
-				continue
-			}
-			seen[fj.ID] = true
-
-			if search != "" {
-				q := strings.ToLower(search)
-				if !strings.Contains(strings.ToLower(fj.SrcIP), q) &&
-					!strings.Contains(strings.ToLower(fj.DstIP), q) &&
-					!strings.Contains(strings.ToLower(fmtPort(fj.SrcPort)), q) &&
-					!strings.Contains(strings.ToLower(fmtPort(fj.DstPort)), q) &&
-					!strings.Contains(strings.ToLower(fj.Protocol), q) &&
-					!strings.Contains(strings.ToLower(fj.AppProtocol), q) {
+				fj := flow.ToJSON()
+				if seen[fj.ID] {
 					continue
 				}
-			}
-			if protoFilter != "" && protoFilter != "all" && fj.Protocol != protoFilter {
-				continue
-			}
-			if appFilter != "" && appFilter != "all" && fj.AppProtocol != appFilter {
-				continue
-			}
-			all = append(all, fj)
+				seen[fj.ID] = true
+
+				if search != "" {
+					q := strings.ToLower(search)
+					if !strings.Contains(strings.ToLower(fj.SrcIP), q) &&
+						!strings.Contains(strings.ToLower(fj.DstIP), q) &&
+						!strings.Contains(strings.ToLower(fmtPort(fj.SrcPort)), q) &&
+						!strings.Contains(strings.ToLower(fmtPort(fj.DstPort)), q) &&
+						!strings.Contains(strings.ToLower(fj.Protocol), q) &&
+						!strings.Contains(strings.ToLower(fj.AppProtocol), q) {
+						continue
+					}
 				}
+				if protoFilter != "" && protoFilter != "all" && fj.Protocol != protoFilter {
+					continue
+				}
+				if appFilter != "" && appFilter != "all" && fj.AppProtocol != appFilter {
+					continue
+				}
+				all = append(all, fj)
 			}
-			ns.mu.RUnlock()
 		}
+		ns.mu.RUnlock()
+	}
 
 	total := len(all)
 
@@ -986,7 +986,7 @@ func (a *Aggregator) PaginatedFlows(nodeID, iface, search, protoFilter, appFilte
 		sort.Slice(all, func(i, j int) bool { return all[i].Bytes < all[j].Bytes })
 	case "packets-desc":
 		sort.Slice(all, func(i, j int) bool { return all[i].Packets > all[j].Packets })
-	case "newest":
+	case "newest", "recent-active":
 		sort.Slice(all, func(i, j int) bool { return all[i].LastSeen > all[j].LastSeen })
 	default: // "bytes-desc"
 		sort.Slice(all, func(i, j int) bool { return all[i].Bytes > all[j].Bytes })
@@ -1549,7 +1549,7 @@ func (a *Aggregator) ServiceMap() ([]ServiceNode, []ServiceEdge) {
 			for _, f := range is.Flows {
 				srcSvc := svcName(f.AppProtocol, f.SrcPort, f.DstPort)
 				dstSvc := svcName(f.AppProtocol, f.SrcPort, f.DstPort)
-				
+
 				s, ok := svcMap[srcSvc]
 				if !ok {
 					s = &svcAcc{hosts: make(map[string]bool)}

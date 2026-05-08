@@ -385,12 +385,12 @@ func (s *Store) AggregateToHourly(cutoff time.Time) error {
 	defer rows.Close()
 
 	type bucket struct {
-		nodeID     string
-		ts         int64
-		sumBytes   float64
-		sumPkts    float64
-		sumFlows   float64
-		count      int
+		nodeID   string
+		ts       int64
+		sumBytes float64
+		sumPkts  float64
+		sumFlows float64
+		count    int
 	}
 	buckets := make(map[int64]*bucket) // key: hour-aligned ts * 100000 + node idx
 	nodeIdx := make(map[string]int)

@@ -26,13 +26,13 @@ type TCPMetricsJSON struct {
 }
 
 type SystemHealthJSON struct {
-	CPUPercent    float64 `json:"cpu_percent"`
-	MemPercent    float64 `json:"mem_percent"`
-	MemUsedBytes  uint64  `json:"mem_used_bytes"`
-	MemTotalBytes uint64  `json:"mem_total_bytes"`
-	DiskFreeBytes uint64  `json:"disk_free_bytes"`
-	DiskTotalBytes uint64 `json:"disk_total_bytes"`
-	UptimeSeconds uint64  `json:"uptime_seconds"`
+	CPUPercent     float64 `json:"cpu_percent"`
+	MemPercent     float64 `json:"mem_percent"`
+	MemUsedBytes   uint64  `json:"mem_used_bytes"`
+	MemTotalBytes  uint64  `json:"mem_total_bytes"`
+	DiskFreeBytes  uint64  `json:"disk_free_bytes"`
+	DiskTotalBytes uint64  `json:"disk_total_bytes"`
+	UptimeSeconds  uint64  `json:"uptime_seconds"`
 }
 
 type InterfaceInfo struct {
@@ -44,24 +44,24 @@ type InterfaceInfo struct {
 }
 
 type NodeInfo struct {
-	NodeID        string             `json:"node_id"`
-	Interface     string             `json:"interface"`
-	Interfaces    []string           `json:"interfaces"`
-	InterfaceInfo []InterfaceInfo    `json:"interface_info"`
-	Tags          []string           `json:"tags"`
-	Online        bool               `json:"online"`
-	BytesPerSec   float64            `json:"bytes_per_sec"`
-	PacketsPerSec float64            `json:"packets_per_sec"`
-	HostsCount    int                `json:"hosts_count"`
-	FlowsCount    int                `json:"flows_count"`
-	LastSeen      int64              `json:"last_seen"`
-	Version       string             `json:"version"`
-	SystemHealth  *SystemHealthJSON  `json:"system_health,omitempty"`
-	TCPMetrics    *TCPMetricsJSON    `json:"tcp_metrics,omitempty"`
-	DNSLatency    *LatencyStatsJSON  `json:"dns_latency,omitempty"`
-	TLSLatency    *LatencyStatsJSON  `json:"tls_latency,omitempty"`
-	TCPLatency    *LatencyStatsJSON  `json:"tcp_latency,omitempty"`
-	VOIPStats *VOIPStatsJSON `json:"voip_stats,omitempty"`
+	NodeID        string            `json:"node_id"`
+	Interface     string            `json:"interface"`
+	Interfaces    []string          `json:"interfaces"`
+	InterfaceInfo []InterfaceInfo   `json:"interface_info"`
+	Tags          []string          `json:"tags"`
+	Online        bool              `json:"online"`
+	BytesPerSec   float64           `json:"bytes_per_sec"`
+	PacketsPerSec float64           `json:"packets_per_sec"`
+	HostsCount    int               `json:"hosts_count"`
+	FlowsCount    int               `json:"flows_count"`
+	LastSeen      int64             `json:"last_seen"`
+	Version       string            `json:"version"`
+	SystemHealth  *SystemHealthJSON `json:"system_health,omitempty"`
+	TCPMetrics    *TCPMetricsJSON   `json:"tcp_metrics,omitempty"`
+	DNSLatency    *LatencyStatsJSON `json:"dns_latency,omitempty"`
+	TLSLatency    *LatencyStatsJSON `json:"tls_latency,omitempty"`
+	TCPLatency    *LatencyStatsJSON `json:"tcp_latency,omitempty"`
+	VOIPStats     *VOIPStatsJSON    `json:"voip_stats,omitempty"`
 }
 
 type LatencyStatsJSON struct {
@@ -88,12 +88,12 @@ type DNSQueryJSON struct {
 }
 
 type PacketSizeDistJSON struct {
-	Size64    uint64 `json:"size_64"`
-	Size128   uint64 `json:"size_128"`
-	Size256   uint64 `json:"size_256"`
-	Size512   uint64 `json:"size_512"`
-	Size1024  uint64 `json:"size_1024"`
-	Size1500  uint64 `json:"size_1500"`
+	Size64     uint64 `json:"size_64"`
+	Size128    uint64 `json:"size_128"`
+	Size256    uint64 `json:"size_256"`
+	Size512    uint64 `json:"size_512"`
+	Size1024   uint64 `json:"size_1024"`
+	Size1500   uint64 `json:"size_1500"`
 	SizeGt1500 uint64 `json:"size_gt1500"`
 }
 

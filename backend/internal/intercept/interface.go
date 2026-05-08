@@ -8,7 +8,7 @@ import (
 type Verdict int
 
 const (
-	VerdictAccept       Verdict = iota
+	VerdictAccept Verdict = iota
 	VerdictAcceptModify
 	VerdictAcceptStream
 	VerdictDrop

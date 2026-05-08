@@ -232,6 +232,16 @@ export interface AlertThresholds {
   flow_flood_threshold: number;
   alert_cooldown_min: number;
   dns_suspicious_ports: number[] | null;
+  suppressed_alert_types?: string[] | null;
+  dns_exfil_query_min_len?: number;
+  dns_exfil_min_bytes?: number;
+  icmp_flood_threshold?: number;
+  syn_flood_ratio?: number;
+  horizontal_scan_threshold?: number;
+  data_exfil_ratio?: number;
+  unexpected_protocols?: string[] | null;
+  arp_spoof_threshold?: number;
+  long_flow_seconds?: number;
 }
 
 export type WSMessage =

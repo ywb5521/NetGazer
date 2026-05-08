@@ -14,9 +14,9 @@ import (
 // Engine provides IP-to-country and IP-to-ASN lookups using MaxMind mmdb files.
 // Falls back to builtin prefix maps when no database is loaded.
 type Engine struct {
-	mu        sync.RWMutex
-	countryDB *maxminddb.Reader
-	asnDB     *maxminddb.Reader
+	mu          sync.RWMutex
+	countryDB   *maxminddb.Reader
+	asnDB       *maxminddb.Reader
 	countryPath string
 	asnPath     string
 }

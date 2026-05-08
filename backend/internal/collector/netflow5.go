@@ -16,24 +16,24 @@ const (
 
 // NetFlow5Record represents a single NetFlow v5 flow record.
 type NetFlow5Record struct {
-	SrcAddr    net.IP
-	DstAddr    net.IP
-	NextHop    net.IP
-	Input      uint16
-	Output     uint16
-	Packets    uint32
-	Bytes      uint32
-	FirstSeen  time.Time
-	LastSeen   time.Time
-	SrcPort    uint16
-	DstPort    uint16
-	TCPFlags   uint8
-	Protocol   uint8
-	TOS        uint8
-	SrcAS      uint16
-	DstAS      uint16
-	SrcMask    uint8
-	DstMask    uint8
+	SrcAddr   net.IP
+	DstAddr   net.IP
+	NextHop   net.IP
+	Input     uint16
+	Output    uint16
+	Packets   uint32
+	Bytes     uint32
+	FirstSeen time.Time
+	LastSeen  time.Time
+	SrcPort   uint16
+	DstPort   uint16
+	TCPFlags  uint8
+	Protocol  uint8
+	TOS       uint8
+	SrcAS     uint16
+	DstAS     uint16
+	SrcMask   uint8
+	DstMask   uint8
 }
 
 // NetFlow5Header represents the NetFlow v5 packet header.

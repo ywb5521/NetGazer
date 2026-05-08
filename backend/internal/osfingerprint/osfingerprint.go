@@ -22,12 +22,12 @@ type TCPFingerprint struct {
 
 // Known TCP/IP stack signatures (TTL, Window, MSS, Options pattern).
 var tcpSignatures = []struct {
-	OS     string
-	TTL    uint8
-	Win    uint16
-	MSS    uint16
-	Opts   string
-	Match  string // "exact" or "ttl_win" or "ttl"
+	OS    string
+	TTL   uint8
+	Win   uint16
+	MSS   uint16
+	Opts  string
+	Match string // "exact" or "ttl_win" or "ttl"
 }{
 	// Linux
 	{OS: "Linux", TTL: 64, Win: 29200, MSS: 1460, Opts: "MSTNW", Match: "ttl_win"},

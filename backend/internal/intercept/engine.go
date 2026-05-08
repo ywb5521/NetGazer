@@ -14,14 +14,14 @@ import (
 )
 
 type EngineConfig struct {
-	IO                              PacketIO
-	Ruleset                         ruleset.Ruleset
-	Workers                         int
-	WorkerQueueSize                 int
-	WorkerTCPMaxBufferedPagesTotal  int
+	IO                               PacketIO
+	Ruleset                          ruleset.Ruleset
+	Workers                          int
+	WorkerQueueSize                  int
+	WorkerTCPMaxBufferedPagesTotal   int
 	WorkerTCPMaxBufferedPagesPerConn int
-	WorkerUDPMaxStreams             int
-	Modifiers                       []modifier.Modifier
+	WorkerUDPMaxStreams              int
+	Modifiers                        []modifier.Modifier
 }
 
 type Engine struct {
@@ -40,14 +40,14 @@ func NewEngine(config EngineConfig) (*Engine, error) {
 	for i := range workers {
 		var err error
 		workers[i], err = newWorker(workerConfig{
-			ID:                          i,
-			ChanSize:                    config.WorkerQueueSize,
-			Logger:                      logger,
-			Ruleset:                     config.Ruleset,
-			TCPMaxBufferedPagesTotal:    config.WorkerTCPMaxBufferedPagesTotal,
-			TCPMaxBufferedPagesPerConn:  config.WorkerTCPMaxBufferedPagesPerConn,
-			UDPMaxStreams:               config.WorkerUDPMaxStreams,
-			Modifiers:                   config.Modifiers,
+			ID:                         i,
+			ChanSize:                   config.WorkerQueueSize,
+			Logger:                     logger,
+			Ruleset:                    config.Ruleset,
+			TCPMaxBufferedPagesTotal:   config.WorkerTCPMaxBufferedPagesTotal,
+			TCPMaxBufferedPagesPerConn: config.WorkerTCPMaxBufferedPagesPerConn,
+			UDPMaxStreams:              config.WorkerUDPMaxStreams,
+			Modifiers:                  config.Modifiers,
 		})
 		if err != nil {
 			return nil, err
@@ -130,16 +130,16 @@ func (e *Engine) dispatch(p Packet) bool {
 // noopLogger provides basic logger output for the engine.
 type noopLogger struct{}
 
-func (l *noopLogger) WorkerStart(id int)                { log.Printf("[intercept] worker %d started", id) }
-func (l *noopLogger) WorkerStop(id int)                 { log.Printf("[intercept] worker %d stopped", id) }
-func (l *noopLogger) TCPStreamNew(id int, info ruleset.StreamInfo) {}
+func (l *noopLogger) WorkerStart(id int)                                      { log.Printf("[intercept] worker %d started", id) }
+func (l *noopLogger) WorkerStop(id int)                                       { log.Printf("[intercept] worker %d stopped", id) }
+func (l *noopLogger) TCPStreamNew(id int, info ruleset.StreamInfo)            {}
 func (l *noopLogger) TCPStreamPropUpdate(info ruleset.StreamInfo, close bool) {}
 func (l *noopLogger) TCPStreamAction(info ruleset.StreamInfo, action ruleset.Action, noMatch bool) {
 	if action == ruleset.ActionBlock {
 		log.Printf("[intercept] BLOCK TCP %s -> %s", info.SrcString(), info.DstString())
 	}
 }
-func (l *noopLogger) UDPStreamNew(id int, info ruleset.StreamInfo) {}
+func (l *noopLogger) UDPStreamNew(id int, info ruleset.StreamInfo)            {}
 func (l *noopLogger) UDPStreamPropUpdate(info ruleset.StreamInfo, close bool) {}
 func (l *noopLogger) UDPStreamAction(info ruleset.StreamInfo, action ruleset.Action, noMatch bool) {
 	if action == ruleset.ActionBlock || action == ruleset.ActionDrop {
@@ -149,9 +149,11 @@ func (l *noopLogger) UDPStreamAction(info ruleset.StreamInfo, action ruleset.Act
 func (l *noopLogger) ModifyError(info ruleset.StreamInfo, err error) {
 	log.Printf("[intercept] modify error: %v", err)
 }
-func (l *noopLogger) AnalyzerDebugf(streamID int64, name string, format string, args ...interface{}) {}
-func (l *noopLogger) AnalyzerInfof(streamID int64, name string, format string, args ...interface{})  {}
-func (l *noopLogger) AnalyzerErrorf(streamID int64, name string, format string, args ...interface{}) {}
+func (l *noopLogger) AnalyzerDebugf(streamID int64, name string, format string, args ...interface{}) {
+}
+func (l *noopLogger) AnalyzerInfof(streamID int64, name string, format string, args ...interface{}) {}
+func (l *noopLogger) AnalyzerErrorf(streamID int64, name string, format string, args ...interface{}) {
+}
 func (l *noopLogger) Log(info ruleset.StreamInfo, name string) {
 	log.Printf("[intercept] rule match: %s on %s -> %s", name, info.SrcString(), info.DstString())
 }

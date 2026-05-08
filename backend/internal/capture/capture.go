@@ -10,9 +10,9 @@ import (
 )
 
 type Engine struct {
-	handle *pcap.Handle
-	iface  string
-	filter string
+	handle  *pcap.Handle
+	iface   string
+	filter  string
 	promisc bool
 }
 

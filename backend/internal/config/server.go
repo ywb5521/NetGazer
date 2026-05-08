@@ -2,9 +2,9 @@ package config
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"flag"
 	"os"
-	"encoding/json"
 	"time"
 )
 
@@ -34,31 +34,31 @@ type CustomOIDConfig struct {
 }
 
 type ServerConfig struct {
-	GRPCPort    int
-	HTTPPort    int
-	DBPath      string
-	Retention   time.Duration
-	TLSCert     string
-	TLSKey      string
-	TLSCA       string
-	SnapshotInterval time.Duration
-	HistoryInterval  time.Duration
-	FlowTimeout      time.Duration
+	GRPCPort              int
+	HTTPPort              int
+	DBPath                string
+	Retention             time.Duration
+	TLSCert               string
+	TLSKey                string
+	TLSCA                 string
+	SnapshotInterval      time.Duration
+	HistoryInterval       time.Duration
+	FlowTimeout           time.Duration
 	BandwidthThresholdBps float64
-	WebhookURL   string
-	JWTSecret    []byte
-	BPFFilter    string
-	NetFlowPort  int
-	SFlowPort    int
-	SNMPConfig   string
-	SNMPDevices  []SNMPDeviceConfig
-	DiscoverySubnets   string // comma-separated CIDR subnets (e.g. "192.168.1.0/24,10.0.0.0/16")
-	SyslogPort         int
-	TrapPort           int
-	GeoIPCountryDB     string // path to MaxMind GeoLite2 Country mmdb file
-	GeoIPASNDB         string // path to MaxMind GeoLite2 ASN mmdb file
-	NodeAuth           bool   // require auth token for agent registration
-	WebDir             string // path to frontend dist directory (enables static file serving)
+	WebhookURL            string
+	JWTSecret             []byte
+	BPFFilter             string
+	NetFlowPort           int
+	SFlowPort             int
+	SNMPConfig            string
+	SNMPDevices           []SNMPDeviceConfig
+	DiscoverySubnets      string // comma-separated CIDR subnets (e.g. "192.168.1.0/24,10.0.0.0/16")
+	SyslogPort            int
+	TrapPort              int
+	GeoIPCountryDB        string // path to MaxMind GeoLite2 Country mmdb file
+	GeoIPASNDB            string // path to MaxMind GeoLite2 ASN mmdb file
+	NodeAuth              bool   // require auth token for agent registration
+	WebDir                string // path to frontend dist directory (enables static file serving)
 }
 
 func ParseServerFlags() *ServerConfig {

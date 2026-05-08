@@ -41,14 +41,14 @@ type worker struct {
 }
 
 type workerConfig struct {
-	ID                          int
-	ChanSize                    int
-	Logger                      engineLogger
-	Ruleset                     ruleset.Ruleset
-	TCPMaxBufferedPagesTotal    int
-	TCPMaxBufferedPagesPerConn  int
-	UDPMaxStreams               int
-	Modifiers                   []modifier.Modifier
+	ID                         int
+	ChanSize                   int
+	Logger                     engineLogger
+	Ruleset                    ruleset.Ruleset
+	TCPMaxBufferedPagesTotal   int
+	TCPMaxBufferedPagesPerConn int
+	UDPMaxStreams              int
+	Modifiers                  []modifier.Modifier
 }
 
 func (c *workerConfig) fillDefaults() {
@@ -83,10 +83,10 @@ func newWorker(config workerConfig) (*worker, error) {
 	tcpAssembler.MaxBufferedPagesTotal = config.TCPMaxBufferedPagesTotal
 	tcpAssembler.MaxBufferedPagesPerConnection = config.TCPMaxBufferedPagesPerConn
 	udpSF := &udpStreamFactory{
-		WorkerID: config.ID,
-		Logger:   config.Logger,
-		Node:     sfNode,
-		Ruleset:  config.Ruleset,
+		WorkerID:  config.ID,
+		Logger:    config.Logger,
+		Node:      sfNode,
+		Ruleset:   config.Ruleset,
 		Modifiers: config.Modifiers,
 	}
 	udpSM, err := newUDPStreamManager(udpSF, config.UDPMaxStreams)

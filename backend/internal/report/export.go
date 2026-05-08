@@ -281,10 +281,10 @@ func escapeTSV(s string) string {
 
 func docFromSnapshot(s models.TrafficSnapshot) map[string]interface{} {
 	return map[string]interface{}{
-		"timestamp":      s.Timestamp.Format(time.RFC3339Nano),
-		"node_id":        s.NodeID,
-		"bytes_per_sec":  s.BytesPerSec,
+		"timestamp":       s.Timestamp.Format(time.RFC3339Nano),
+		"node_id":         s.NodeID,
+		"bytes_per_sec":   s.BytesPerSec,
 		"packets_per_sec": s.PacketsPerSec,
-		"flows_count":    s.FlowsCount,
+		"flows_count":     s.FlowsCount,
 	}
 }

@@ -10,26 +10,26 @@ import (
 const (
 	nf9HeaderSize = 20
 	// NetFlow v9 field type IDs
-	nf9InBytes   = 1
-	nf9InPkts    = 2
-	nf9Protocol  = 4
-	nf9SrcPort   = 7
-	nf9SrcIPv4   = 8
-	nf9SrcMask   = 9
-	nf9InSnmp    = 10
-	nf9DstPort   = 11
-	nf9DstIPv4   = 12
-	nf9DstMask   = 13
-	nf9OutSnmp   = 14
-	nf9NextHop4  = 15
-	nf9SrcAS     = 16
-	nf9DstAS     = 17
-	nf9LastSw    = 21
-	nf9FirstSw   = 22
-	nf9IPv6Src   = 27
-	nf9IPv6Dst   = 28
-	nf9IPv6NHop  = 62
-	nf9TCPFlags  = 6
+	nf9InBytes  = 1
+	nf9InPkts   = 2
+	nf9Protocol = 4
+	nf9SrcPort  = 7
+	nf9SrcIPv4  = 8
+	nf9SrcMask  = 9
+	nf9InSnmp   = 10
+	nf9DstPort  = 11
+	nf9DstIPv4  = 12
+	nf9DstMask  = 13
+	nf9OutSnmp  = 14
+	nf9NextHop4 = 15
+	nf9SrcAS    = 16
+	nf9DstAS    = 17
+	nf9LastSw   = 21
+	nf9FirstSw  = 22
+	nf9IPv6Src  = 27
+	nf9IPv6Dst  = 28
+	nf9IPv6NHop = 62
+	nf9TCPFlags = 6
 )
 
 type nf9Template struct {
@@ -104,7 +104,7 @@ func parseNetFlow9(data []byte, srcIP net.IP) ([]NetFlow9Record, []nf9Template, 
 
 		if setID == 0 {
 			// Template flowset
-			tmpls := parseTemplates(data[offset+4 : offset+setLen], hdr.SourceID)
+			tmpls := parseTemplates(data[offset+4:offset+setLen], hdr.SourceID)
 			templates = append(templates, tmpls...)
 		} else if setID > 255 {
 			// Data flowset

@@ -5,20 +5,20 @@ import "time"
 type AlertType string
 
 const (
-	AlertHighBandwidth        AlertType = "high_bandwidth"
-	AlertNewDevice            AlertType = "new_device"
-	AlertSuspiciousPort       AlertType = "suspicious_port"
-	AlertFlowFlood            AlertType = "flow_flood"
-	AlertPortScan             AlertType = "port_scan"
-	AlertDNSSuspiciousPort    AlertType = "dns_suspicious_port"
-	AlertDNSExfiltration      AlertType = "dns_exfiltration"
-	AlertICMPFlood            AlertType = "icmp_flood"
-	AlertSYNFlood             AlertType = "syn_flood"
-	AlertHorizontalScan       AlertType = "horizontal_scan"
-	AlertDataExfiltration     AlertType = "data_exfiltration"
-	AlertUnexpectedProtocol   AlertType = "unexpected_protocol"
-	AlertARPSpoof             AlertType = "arp_spoof"
-	AlertLongFlow             AlertType = "long_flow"
+	AlertHighBandwidth      AlertType = "high_bandwidth"
+	AlertNewDevice          AlertType = "new_device"
+	AlertSuspiciousPort     AlertType = "suspicious_port"
+	AlertFlowFlood          AlertType = "flow_flood"
+	AlertPortScan           AlertType = "port_scan"
+	AlertDNSSuspiciousPort  AlertType = "dns_suspicious_port"
+	AlertDNSExfiltration    AlertType = "dns_exfiltration"
+	AlertICMPFlood          AlertType = "icmp_flood"
+	AlertSYNFlood           AlertType = "syn_flood"
+	AlertHorizontalScan     AlertType = "horizontal_scan"
+	AlertDataExfiltration   AlertType = "data_exfiltration"
+	AlertUnexpectedProtocol AlertType = "unexpected_protocol"
+	AlertARPSpoof           AlertType = "arp_spoof"
+	AlertLongFlow           AlertType = "long_flow"
 )
 
 type Severity string
@@ -61,5 +61,55 @@ func (a *Alert) ToJSON() AlertJSON {
 		NodeID:       a.NodeID,
 		Timestamp:    a.Timestamp.UnixMilli(),
 		Acknowledged: a.Acknowledged,
+	}
+}
+
+func (t AlertType) LabelZH() string {
+	switch t {
+	case AlertHighBandwidth:
+		return "高带宽占用"
+	case AlertNewDevice:
+		return "新设备"
+	case AlertSuspiciousPort:
+		return "可疑端口"
+	case AlertFlowFlood:
+		return "流量洪泛"
+	case AlertPortScan:
+		return "端口扫描"
+	case AlertDNSSuspiciousPort:
+		return "DNS 非标准端口"
+	case AlertDNSExfiltration:
+		return "DNS 外传"
+	case AlertICMPFlood:
+		return "ICMP 洪泛"
+	case AlertSYNFlood:
+		return "SYN 洪泛"
+	case AlertHorizontalScan:
+		return "水平扫描"
+	case AlertDataExfiltration:
+		return "数据外传"
+	case AlertUnexpectedProtocol:
+		return "异常协议"
+	case AlertARPSpoof:
+		return "ARP 欺骗"
+	case AlertLongFlow:
+		return "长连接"
+	case AlertType("test"):
+		return "测试通知"
+	default:
+		return string(t)
+	}
+}
+
+func (s Severity) LabelZH() string {
+	switch s {
+	case SeverityCritical:
+		return "严重"
+	case SeverityWarning:
+		return "警告"
+	case SeverityInfo:
+		return "提示"
+	default:
+		return string(s)
 	}
 }

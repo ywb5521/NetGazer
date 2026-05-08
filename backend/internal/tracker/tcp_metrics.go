@@ -7,16 +7,16 @@ import (
 
 // TCPFlowMetrics holds per-flow TCP statistics.
 type TCPFlowMetrics struct {
-	RetransmitCount  int64
-	RSTCount         int64
-	ZeroWindowCount  int64
-	OutOfOrderCount  int64
-	SYNCount         int64
-	FINCount         int64
-	RTTAvgMS         float64
-	RTTMinMS         float64
-	RTTMaxMS         float64
-	RTTSamples       int64
+	RetransmitCount int64
+	RSTCount        int64
+	ZeroWindowCount int64
+	OutOfOrderCount int64
+	SYNCount        int64
+	FINCount        int64
+	RTTAvgMS        float64
+	RTTMinMS        float64
+	RTTMaxMS        float64
+	RTTSamples      int64
 }
 
 // TCPMetricsTracker tracks TCP-level health metrics across all flows.
@@ -25,12 +25,12 @@ type TCPMetricsTracker struct {
 	flows map[string]*tcpFlowState
 
 	// Aggregated global counters
-	totalRetransmits    int64
-	totalRSTs           int64
-	totalZeroWindows    int64
-	totalOutOfOrder     int64
-	totalExpectedPkts   int64
-	totalLostPkts       int64
+	totalRetransmits  int64
+	totalRSTs         int64
+	totalZeroWindows  int64
+	totalOutOfOrder   int64
+	totalExpectedPkts int64
+	totalLostPkts     int64
 }
 
 type tcpFlowState struct {

@@ -24,7 +24,9 @@ type GenericWebhookSender struct {
 	client *http.Client
 }
 
-func (s *GenericWebhookSender) Type() models.NotificationChannelType { return models.ChannelGenericWebhook }
+func (s *GenericWebhookSender) Type() models.NotificationChannelType {
+	return models.ChannelGenericWebhook
+}
 
 func (s *GenericWebhookSender) Send(alert models.Alert) error {
 	payload := map[string]interface{}{
@@ -66,11 +68,11 @@ func (s *SlackSender) Send(alert models.Alert) error {
 	payload := map[string]interface{}{
 		"attachments": []map[string]interface{}{{
 			"color": color,
-			"title": fmt.Sprintf("[%s] %s", alert.Type, alert.Message),
+			"title": fmt.Sprintf("[%s] %s", alert.Type.LabelZH(), alert.Message),
 			"fields": []map[string]interface{}{
-				{"title": "Severity", "value": string(alert.Severity), "short": true},
-				{"title": "Source IP", "value": alert.SourceIP, "short": true},
-				{"title": "Node", "value": alert.NodeID, "short": true},
+				{"title": "级别", "value": alert.Severity.LabelZH(), "short": true},
+				{"title": "源 IP", "value": alert.SourceIP, "short": true},
+				{"title": "节点", "value": alert.NodeID, "short": true},
 			},
 			"ts": alert.Timestamp.Unix(),
 		}},
@@ -97,9 +99,9 @@ type DingTalkSender struct {
 func (s *DingTalkSender) Type() models.NotificationChannelType { return models.ChannelDingTalk }
 
 func (s *DingTalkSender) Send(alert models.Alert) error {
-	title := fmt.Sprintf("netgazer Alert: %s", alert.Type)
-	text := fmt.Sprintf("## %s\n\n**Type:** %s\n**Severity:** %s\n**Source:** %s\n**Node:** %s\n**Time:** %s\n\n%s",
-		title, alert.Type, alert.Severity, alert.SourceIP,
+	title := fmt.Sprintf("netgazer 告警：%s", alert.Type.LabelZH())
+	text := fmt.Sprintf("## %s\n\n**类型：** %s\n**级别：** %s\n**源地址：** %s\n**节点：** %s\n**时间：** %s\n\n%s",
+		title, alert.Type.LabelZH(), alert.Severity.LabelZH(), alert.SourceIP,
 		alert.NodeID, alert.Timestamp.Format(time.RFC3339), alert.Message)
 	payload := map[string]interface{}{
 		"msgtype": "markdown",
@@ -143,13 +145,13 @@ func (s *FeishuSender) Send(alert models.Alert) error {
 			"header": map[string]interface{}{
 				"title": map[string]string{
 					"tag":     "plain_text",
-					"content": fmt.Sprintf("netgazer: %s", alert.Type),
+					"content": fmt.Sprintf("netgazer：%s", alert.Type.LabelZH()),
 				},
 				"template": color,
 			},
 			"elements": []map[string]interface{}{
 				{"tag": "div", "text": map[string]string{"tag": "lark_md", "content": alert.Message}},
-				{"tag": "div", "text": map[string]string{"tag": "lark_md", "content": fmt.Sprintf("**Severity:** %s | **Source:** %s | **Node:** %s", alert.Severity, alert.SourceIP, alert.NodeID)}},
+				{"tag": "div", "text": map[string]string{"tag": "lark_md", "content": fmt.Sprintf("**级别：** %s | **源地址：** %s | **节点：** %s", alert.Severity.LabelZH(), alert.SourceIP, alert.NodeID)}},
 			},
 		},
 	}
@@ -183,10 +185,10 @@ type EmailSender struct {
 func (s *EmailSender) Type() models.NotificationChannelType { return models.ChannelEmail }
 
 func (s *EmailSender) Send(alert models.Alert) error {
-	subject := fmt.Sprintf("netgazer [%s] %s - %s", alert.Severity, alert.Type, alert.SourceIP)
-	body := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\nType: %s\nSeverity: %s\nMessage: %s\nSource IP: %s\nNode: %s\nTime: %s\n",
+	subject := fmt.Sprintf("netgazer [%s] %s - %s", alert.Severity.LabelZH(), alert.Type.LabelZH(), alert.SourceIP)
+	body := fmt.Sprintf("From: %s\r\nTo: %s\r\nSubject: %s\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\n类型：%s\n级别：%s\n消息：%s\n源 IP：%s\n节点：%s\n时间：%s\n",
 		s.cfg.From, strings.Join(s.cfg.To, ", "), subject,
-		alert.Type, alert.Severity, alert.Message, alert.SourceIP,
+		alert.Type.LabelZH(), alert.Severity.LabelZH(), alert.Message, alert.SourceIP,
 		alert.NodeID, alert.Timestamp.Format(time.RFC3339))
 
 	addr := fmt.Sprintf("%s:%d", s.cfg.SMTPServer, s.cfg.SMTPPort)
@@ -197,9 +199,9 @@ func (s *EmailSender) Send(alert models.Alert) error {
 // ---- telegram ----
 
 type TelegramSender struct {
-	apiURL  string
-	chatID  string
-	client  *http.Client
+	apiURL string
+	chatID string
+	client *http.Client
 }
 
 func (s *TelegramSender) Type() models.NotificationChannelType { return models.ChannelTelegram }
@@ -215,8 +217,8 @@ func (s *TelegramSender) Send(alert models.Alert) error {
 		emoji = "🟢"
 	}
 	text := fmt.Sprintf(
-		"%s <b>[%s] %s</b>\n<pre>%s</pre>\n<b>Source IP:</b> %s\n<b>Node:</b> %s\n<b>Time:</b> %s",
-		emoji, alert.Severity, alert.Type, alert.Message,
+		"%s <b>[%s] %s</b>\n<pre>%s</pre>\n<b>源 IP：</b> %s\n<b>节点：</b> %s\n<b>时间：</b> %s",
+		emoji, alert.Severity.LabelZH(), alert.Type.LabelZH(), alert.Message,
 		alert.SourceIP, alert.NodeID, alert.Timestamp.Format(time.RFC3339),
 	)
 	payload := map[string]string{
@@ -242,7 +244,9 @@ func NewSender(ch models.NotificationChannel) (ChannelSender, error) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	switch ch.Type {
 	case models.ChannelGenericWebhook:
-		var cfg struct{ URL string `json:"url"` }
+		var cfg struct {
+			URL string `json:"url"`
+		}
 		if err := json.Unmarshal(ch.Config, &cfg); err != nil {
 			return nil, fmt.Errorf("invalid config: %w", err)
 		}
@@ -252,7 +256,9 @@ func NewSender(ch models.NotificationChannel) (ChannelSender, error) {
 		return &GenericWebhookSender{url: cfg.URL, client: client}, nil
 
 	case models.ChannelSlack:
-		var cfg struct{ URL string `json:"url"` }
+		var cfg struct {
+			URL string `json:"url"`
+		}
 		if err := json.Unmarshal(ch.Config, &cfg); err != nil {
 			return nil, fmt.Errorf("invalid config: %w", err)
 		}
@@ -262,7 +268,9 @@ func NewSender(ch models.NotificationChannel) (ChannelSender, error) {
 		return &SlackSender{url: cfg.URL, client: client}, nil
 
 	case models.ChannelDingTalk:
-		var cfg struct{ URL string `json:"url"` }
+		var cfg struct {
+			URL string `json:"url"`
+		}
 		if err := json.Unmarshal(ch.Config, &cfg); err != nil {
 			return nil, fmt.Errorf("invalid config: %w", err)
 		}
@@ -272,7 +280,9 @@ func NewSender(ch models.NotificationChannel) (ChannelSender, error) {
 		return &DingTalkSender{url: cfg.URL, client: client}, nil
 
 	case models.ChannelFeishu:
-		var cfg struct{ URL string `json:"url"` }
+		var cfg struct {
+			URL string `json:"url"`
+		}
 		if err := json.Unmarshal(ch.Config, &cfg); err != nil {
 			return nil, fmt.Errorf("invalid config: %w", err)
 		}
@@ -291,22 +301,22 @@ func NewSender(ch models.NotificationChannel) (ChannelSender, error) {
 		}
 		return &EmailSender{cfg: cfg}, nil
 
-		case models.ChannelTelegram:
-			var cfg struct {
-				BotToken string `json:"bot_token"`
-				ChatID   string `json:"chat_id"`
-			}
-			if err := json.Unmarshal(ch.Config, &cfg); err != nil {
-				return nil, fmt.Errorf("invalid config: %w", err)
-			}
-			if cfg.BotToken == "" || cfg.ChatID == "" {
-				return nil, fmt.Errorf("bot_token and chat_id are required")
-			}
-			return &TelegramSender{
-				apiURL: fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", cfg.BotToken),
-				chatID: cfg.ChatID,
-				client: client,
-			}, nil
+	case models.ChannelTelegram:
+		var cfg struct {
+			BotToken string `json:"bot_token"`
+			ChatID   string `json:"chat_id"`
+		}
+		if err := json.Unmarshal(ch.Config, &cfg); err != nil {
+			return nil, fmt.Errorf("invalid config: %w", err)
+		}
+		if cfg.BotToken == "" || cfg.ChatID == "" {
+			return nil, fmt.Errorf("bot_token and chat_id are required")
+		}
+		return &TelegramSender{
+			apiURL: fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", cfg.BotToken),
+			chatID: cfg.ChatID,
+			client: client,
+		}, nil
 
 	default:
 		return nil, fmt.Errorf("unknown channel type: %s", ch.Type)
@@ -320,7 +330,7 @@ func SendTest(ch models.NotificationChannel) error {
 		ID:        "test-" + time.Now().Format("150405"),
 		Type:      models.AlertType("test"),
 		Severity:  models.SeverityInfo,
-		Message:   "netgazer test notification",
+		Message:   "netgazer 测试通知",
 		SourceIP:  "127.0.0.1",
 		NodeID:    "test",
 		Timestamp: time.Now(),

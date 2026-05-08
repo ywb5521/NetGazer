@@ -93,11 +93,11 @@ func (s *Server) GetHostPoolStats(w http.ResponseWriter, r *http.Request) {
 
 	// Aggregate hosts matching the pool CIDRs
 	type poolHost struct {
-		IP        string `json:"ip"`
-		Hostname  string `json:"hostname"`
-		BytesIn   uint64 `json:"bytes_in"`
-		BytesOut  uint64 `json:"bytes_out"`
-		Country   string `json:"country"`
+		IP       string `json:"ip"`
+		Hostname string `json:"hostname"`
+		BytesIn  uint64 `json:"bytes_in"`
+		BytesOut uint64 `json:"bytes_out"`
+		Country  string `json:"country"`
 	}
 
 	gs := s.agg.GlobalSnapshot()

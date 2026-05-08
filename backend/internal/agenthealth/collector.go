@@ -9,13 +9,13 @@ import (
 )
 
 type Health struct {
-	CPUPercent    float64
-	MemPercent    float64
-	MemUsedBytes  uint64
-	MemTotalBytes uint64
-	DiskFreeBytes uint64
+	CPUPercent     float64
+	MemPercent     float64
+	MemUsedBytes   uint64
+	MemTotalBytes  uint64
+	DiskFreeBytes  uint64
 	DiskTotalBytes uint64
-	UptimeSeconds uint64
+	UptimeSeconds  uint64
 }
 
 var prevIdle, prevTotal uint64

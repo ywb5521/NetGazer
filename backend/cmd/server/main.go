@@ -348,7 +348,7 @@ func main() {
 				alertsJSON := make([]models.AlertJSON, len(rawAlerts))
 				for i, a := range rawAlerts {
 					alertsJSON[i] = a.ToJSON()
-					}
+				}
 				gs.Alerts = alertsJSON
 				hub.BroadcastMessage("snapshot", gs)
 			}

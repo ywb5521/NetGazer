@@ -21,13 +21,13 @@ type DiscoveredHost struct {
 
 // Config holds discovery scanner configuration.
 type Config struct {
-	Subnets       []string      // CIDR subnets to scan (e.g. "192.168.1.0/24")
-	Interval      time.Duration // scan interval (0 = run once)
-	PingTimeout   time.Duration
-	ARPTimeout    time.Duration
-	PingCount     int
-	PingParallel  int
-	Interface     string // specific interface to use, empty = auto-detect
+	Subnets      []string      // CIDR subnets to scan (e.g. "192.168.1.0/24")
+	Interval     time.Duration // scan interval (0 = run once)
+	PingTimeout  time.Duration
+	ARPTimeout   time.Duration
+	PingCount    int
+	PingParallel int
+	Interface    string // specific interface to use, empty = auto-detect
 }
 
 // DefaultConfig returns sensible defaults.
@@ -43,9 +43,9 @@ func DefaultConfig() Config {
 
 // Scanner performs network discovery and reports findings to the aggregator.
 type Scanner struct {
-	cfg  Config
-	agg  *aggregator.Aggregator
-	mu   sync.Mutex
+	cfg     Config
+	agg     *aggregator.Aggregator
+	mu      sync.Mutex
 	running bool
 }
 

@@ -19,11 +19,11 @@ const PAGE_SIZE = 50;
 
 const PROTOCOL_FILTERS = ['all', 'TCP', 'UDP', 'ICMP'];
 const SORT_OPTIONS = [
-  { value: 'bytes-desc', label: 'Bytes ↓' },
-  { value: 'bytes-asc', label: 'Bytes ↑' },
-  { value: 'packets-desc', label: 'Packets ↓' },
-  { value: 'newest', label: 'Newest' },
-];
+  { value: 'bytes-desc', labelKey: 'sortBytesDesc' },
+  { value: 'bytes-asc', labelKey: 'sortBytesAsc' },
+  { value: 'packets-desc', labelKey: 'sortPacketsDesc' },
+  { value: 'newest', labelKey: 'sortRecentActive' },
+] as const;
 
 type QuickFilter = { label: string; app?: string[]; minBytes?: number };
 
@@ -229,7 +229,7 @@ export default function FlowsPage() {
           </SelectTrigger>
           <SelectContent>
             {SORT_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+              <SelectItem key={opt.value} value={opt.value}>{t.flows[opt.labelKey]}</SelectItem>
             ))}
           </SelectContent>
         </Select>

@@ -8,9 +8,9 @@ import (
 )
 
 type ProtocolTracker struct {
-	mu     sync.RWMutex
-	stats  map[string]*models.ProtocolStat
-	total  uint64
+	mu    sync.RWMutex
+	stats map[string]*models.ProtocolStat
+	total uint64
 }
 
 func NewProtocolTracker() *ProtocolTracker {

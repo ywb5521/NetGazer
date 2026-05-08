@@ -7,12 +7,12 @@ import (
 )
 
 type PacketSizeDist struct {
-	Size64    uint64
-	Size128   uint64
-	Size256   uint64
-	Size512   uint64
-	Size1024  uint64
-	Size1500  uint64
+	Size64     uint64
+	Size128    uint64
+	Size256    uint64
+	Size512    uint64
+	Size1024   uint64
+	Size1500   uint64
 	SizeGt1500 uint64
 }
 

@@ -13,12 +13,12 @@ import (
 
 // TrapMessage represents a parsed SNMP trap.
 type TrapMessage struct {
-	ID        string    `json:"id"`
-	Timestamp time.Time `json:"timestamp"`
-	Source    string    `json:"source"`
-	Version   string    `json:"version"`
-	Community string    `json:"community,omitempty"`
-	OID       string    `json:"oid"`
+	ID        string            `json:"id"`
+	Timestamp time.Time         `json:"timestamp"`
+	Source    string            `json:"source"`
+	Version   string            `json:"version"`
+	Community string            `json:"community,omitempty"`
+	OID       string            `json:"oid"`
 	Variables map[string]string `json:"variables"`
 }
 

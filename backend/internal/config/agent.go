@@ -9,21 +9,21 @@ import (
 )
 
 type AgentConfig struct {
-	ServerAddr  string
-	Interface   string   // deprecated, kept for backward compat
-	Interfaces  []string // parsed from --interfaces or fallback to --interface
-	NodeID      string
-	BPFFilter   string
-	Tags        string
-	TLSCert     string
-	TLSKey      string
-	TLSCA       string
-	ProtoEngine string // "ndpi", "opengfw", "both"
-	Intercept   bool
-	InterceptLocal bool
-	InterceptRST   bool
-	AuthToken         string        // shared secret for node authentication
-	SnapshotInterval  time.Duration // snapshot reporting interval to server
+	ServerAddr       string
+	Interface        string   // deprecated, kept for backward compat
+	Interfaces       []string // parsed from --interfaces or fallback to --interface
+	NodeID           string
+	BPFFilter        string
+	Tags             string
+	TLSCert          string
+	TLSKey           string
+	TLSCA            string
+	ProtoEngine      string // "ndpi", "opengfw", "both"
+	Intercept        bool
+	InterceptLocal   bool
+	InterceptRST     bool
+	AuthToken        string        // shared secret for node authentication
+	SnapshotInterval time.Duration // snapshot reporting interval to server
 }
 
 func ParseAgentFlags() *AgentConfig {

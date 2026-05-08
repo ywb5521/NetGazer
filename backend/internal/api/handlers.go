@@ -17,12 +17,12 @@ import (
 	"github.com/netgazer/backend/internal/aggregator"
 	"github.com/netgazer/backend/internal/alerting"
 	"github.com/netgazer/backend/internal/auth"
-	"github.com/netgazer/backend/internal/config"
-	"github.com/netgazer/backend/internal/models"
 	"github.com/netgazer/backend/internal/collector"
+	"github.com/netgazer/backend/internal/config"
 	"github.com/netgazer/backend/internal/geoip"
-	"github.com/netgazer/backend/internal/report"
 	"github.com/netgazer/backend/internal/lua"
+	"github.com/netgazer/backend/internal/models"
+	"github.com/netgazer/backend/internal/report"
 	"github.com/netgazer/backend/internal/storage"
 	"github.com/netgazer/backend/internal/webhook"
 )
@@ -1135,140 +1135,140 @@ func (s *Server) TestLuaScript(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
-	// ── GeoIP handlers ──
+// ── GeoIP handlers ──
 
-	func (s *Server) GetGeoIPStatus(w http.ResponseWriter, r *http.Request) {
-		if s.geoipEng == nil {
-			writeJSON(w, http.StatusOK, map[string]any{"ready": false})
-			return
-		}
-		writeJSON(w, http.StatusOK, s.geoipEng.Status())
+func (s *Server) GetGeoIPStatus(w http.ResponseWriter, r *http.Request) {
+	if s.geoipEng == nil {
+		writeJSON(w, http.StatusOK, map[string]any{"ready": false})
+		return
+	}
+	writeJSON(w, http.StatusOK, s.geoipEng.Status())
+}
+
+func (s *Server) UploadGeoIPDB(w http.ResponseWriter, r *http.Request) {
+	if s.geoipEng == nil {
+		writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": "GeoIP engine not available"})
+		return
+	}
+	if err := r.ParseMultipartForm(100 << 20); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "failed to parse multipart form"})
+		return
+	}
+	dbType := r.FormValue("type")
+
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "file is required"})
+		return
+	}
+	defer file.Close()
+
+	if err := geoip.EnsureDir(); err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to create data directory"})
+		return
 	}
 
-	func (s *Server) UploadGeoIPDB(w http.ResponseWriter, r *http.Request) {
-		if s.geoipEng == nil {
-			writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": "GeoIP engine not available"})
-			return
-		}
-		if err := r.ParseMultipartForm(100 << 20); err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "failed to parse multipart form"})
-			return
-		}
-		dbType := r.FormValue("type")
-
-		file, header, err := r.FormFile("file")
-		if err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "file is required"})
-			return
-		}
-		defer file.Close()
-
-		if err := geoip.EnsureDir(); err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to create data directory"})
-			return
-		}
-
-		ext := filepath.Ext(header.Filename)
-		savePath := filepath.Join(geoip.GeoipDir, dbType+ext)
-		if dbType != "country" && dbType != "asn" {
-			savePath = filepath.Join(geoip.GeoipDir, "geoip"+ext)
-		}
-
-		dst, err := os.Create(savePath)
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to save file: " + err.Error()})
-			return
-		}
-		defer dst.Close()
-		if _, err := io.Copy(dst, file); err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to write file: " + err.Error()})
-			return
-		}
-
-		var loadErr error
-		switch dbType {
-		case "country":
-			loadErr = s.geoipEng.LoadCountry(savePath)
-		case "asn":
-			loadErr = s.geoipEng.LoadASN(savePath)
-		}
-
-		if loadErr != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "file saved but failed to load: " + loadErr.Error()})
-			return
-		}
-
-		writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "path": savePath, "type": dbType, "size": header.Size})
+	ext := filepath.Ext(header.Filename)
+	savePath := filepath.Join(geoip.GeoipDir, dbType+ext)
+	if dbType != "country" && dbType != "asn" {
+		savePath = filepath.Join(geoip.GeoipDir, "geoip"+ext)
 	}
 
-	func (s *Server) DownloadGeoIPDB(w http.ResponseWriter, r *http.Request) {
-		if s.geoipEng == nil {
-			writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": "GeoIP engine not available"})
-			return
-		}
-
-		var req struct {
-			URL  string `json:"url"`
-			Type string `json:"type"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid request"})
-			return
-		}
-		if req.URL == "" {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "url is required"})
-			return
-		}
-
-		if err := geoip.EnsureDir(); err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to create data directory"})
-			return
-		}
-
-		savePath := filepath.Join(geoip.GeoipDir, req.Type+".mmdb")
-
-		resp, err := http.Get(req.URL)
-		if err != nil {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "download failed: " + err.Error()})
-			return
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			writeJSON(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("download returned status %d", resp.StatusCode)})
-			return
-		}
-
-		dst, err := os.Create(savePath)
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to create file: " + err.Error()})
-			return
-		}
-		defer dst.Close()
-
-		written, err := io.Copy(dst, resp.Body)
-		if err != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to write file: " + err.Error()})
-			return
-		}
-
-		var loadErr error
-		switch req.Type {
-		case "country":
-			loadErr = s.geoipEng.LoadCountry(savePath)
-		case "asn":
-			loadErr = s.geoipEng.LoadASN(savePath)
-		}
-
-		if loadErr != nil {
-			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "file downloaded but failed to load: " + loadErr.Error()})
-			return
-		}
-
-		s.store.SetConfig("geoip_"+req.Type+"_url", req.URL)
-
-		writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "path": savePath, "type": req.Type, "size": written})
+	dst, err := os.Create(savePath)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to save file: " + err.Error()})
+		return
 	}
+	defer dst.Close()
+	if _, err := io.Copy(dst, file); err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to write file: " + err.Error()})
+		return
+	}
+
+	var loadErr error
+	switch dbType {
+	case "country":
+		loadErr = s.geoipEng.LoadCountry(savePath)
+	case "asn":
+		loadErr = s.geoipEng.LoadASN(savePath)
+	}
+
+	if loadErr != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "file saved but failed to load: " + loadErr.Error()})
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "path": savePath, "type": dbType, "size": header.Size})
+}
+
+func (s *Server) DownloadGeoIPDB(w http.ResponseWriter, r *http.Request) {
+	if s.geoipEng == nil {
+		writeJSON(w, http.StatusServiceUnavailable, map[string]string{"error": "GeoIP engine not available"})
+		return
+	}
+
+	var req struct {
+		URL  string `json:"url"`
+		Type string `json:"type"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid request"})
+		return
+	}
+	if req.URL == "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "url is required"})
+		return
+	}
+
+	if err := geoip.EnsureDir(); err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to create data directory"})
+		return
+	}
+
+	savePath := filepath.Join(geoip.GeoipDir, req.Type+".mmdb")
+
+	resp, err := http.Get(req.URL)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "download failed: " + err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": fmt.Sprintf("download returned status %d", resp.StatusCode)})
+		return
+	}
+
+	dst, err := os.Create(savePath)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to create file: " + err.Error()})
+		return
+	}
+	defer dst.Close()
+
+	written, err := io.Copy(dst, resp.Body)
+	if err != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "failed to write file: " + err.Error()})
+		return
+	}
+
+	var loadErr error
+	switch req.Type {
+	case "country":
+		loadErr = s.geoipEng.LoadCountry(savePath)
+	case "asn":
+		loadErr = s.geoipEng.LoadASN(savePath)
+	}
+
+	if loadErr != nil {
+		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": "file downloaded but failed to load: " + loadErr.Error()})
+		return
+	}
+
+	s.store.SetConfig("geoip_"+req.Type+"_url", req.URL)
+
+	writeJSON(w, http.StatusOK, map[string]any{"status": "ok", "path": savePath, "type": req.Type, "size": written})
+}
 
 func (s *Server) ListNodeTokens(w http.ResponseWriter, r *http.Request) {
 	records, err := s.store.ListNodeTokens()

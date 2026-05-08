@@ -46,14 +46,14 @@ type Callback func(severity, alertType, message string)
 
 // Engine manages Lua scripts and their execution.
 type Engine struct {
-	mu          sync.RWMutex
-	scripts     map[string]*Script
-	pool        []*lua.LState
-	poolMu      sync.Mutex
-	poolSize    int
-	hostsFunc   func(nodeID string) []Host
-	flowsFunc   func(nodeID string) []Flow
-	alertCB     Callback
+	mu        sync.RWMutex
+	scripts   map[string]*Script
+	pool      []*lua.LState
+	poolMu    sync.Mutex
+	poolSize  int
+	hostsFunc func(nodeID string) []Host
+	flowsFunc func(nodeID string) []Flow
+	alertCB   Callback
 }
 
 // NewEngine creates a Lua scripting engine.

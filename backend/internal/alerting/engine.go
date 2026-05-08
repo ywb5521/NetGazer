@@ -22,6 +22,7 @@ type Engine struct {
 	bannedPorts           map[uint16]bool
 	dnsSuspiciousPorts    map[uint16]bool
 	unexpectedProtos      map[string]bool
+	suppressedTypes       map[models.AlertType]bool
 	seenHosts             map[string]bool
 	portScans             map[string]*portScanState
 	// Horizontal scan state: "nodeID:srcIP:dstPort" -> set of dstIPs
@@ -79,6 +80,10 @@ func (e *Engine) rebuildMaps() {
 	e.unexpectedProtos = make(map[string]bool)
 	for _, p := range e.thresholds.UnexpectedProtocols {
 		e.unexpectedProtos[p] = true
+	}
+	e.suppressedTypes = make(map[models.AlertType]bool)
+	for _, t := range e.thresholds.SuppressedAlertTypes {
+		e.suppressedTypes[models.AlertType(t)] = true
 	}
 }
 
@@ -143,14 +148,17 @@ func (e *Engine) recordFire(fingerprint string) {
 }
 
 func (e *Engine) emit(alert models.Alert) {
+	if e.suppressedTypes[alert.Type] {
+		return
+	}
 	e.alerts = append(e.alerts, alert)
 	e.outCh <- alert
 }
 
 func (e *Engine) removeStaleAlerts() {
 	ackCutoff := time.Now().Add(-10 * time.Minute)
-	unackCutoff := time.Now().Add(-24 * time.Hour)  // remove unacknowledged alerts after 24h
-	maxAlerts := 10000 // hard cap on in-memory alerts
+	unackCutoff := time.Now().Add(-24 * time.Hour) // remove unacknowledged alerts after 24h
+	maxAlerts := 10000                             // hard cap on in-memory alerts
 
 	kept := make([]models.Alert, 0, len(e.alerts))
 	for _, a := range e.alerts {
@@ -194,7 +202,7 @@ func (e *Engine) CheckHostBandwidth(hosts []models.Host, nodeID string) {
 			ID:        fmt.Sprintf("bw-%s", nodeID),
 			Type:      models.AlertHighBandwidth,
 			Severity:  models.SeverityWarning,
-			Message:   fmt.Sprintf("High bandwidth usage on node %s: %.1f Mbps", nodeID, totalBW/1_000_000),
+			Message:   fmt.Sprintf("节点 %s 带宽占用过高：%.1f Mbps", nodeID, totalBW/1_000_000),
 			NodeID:    nodeID,
 			Timestamp: time.Now(),
 		})
@@ -217,7 +225,7 @@ func (e *Engine) CheckNewHost(hosts []models.Host) {
 				ID:        fmt.Sprintf("new-%s-%s", h.NodeID, h.IP),
 				Type:      models.AlertNewDevice,
 				Severity:  models.SeverityInfo,
-				Message:   fmt.Sprintf("New device detected: %s (%s) on node %s", h.IP, h.MAC, h.NodeID),
+				Message:   fmt.Sprintf("检测到新设备：%s (%s)，节点 %s", h.IP, h.MAC, h.NodeID),
 				SourceIP:  h.IP,
 				NodeID:    h.NodeID,
 				Timestamp: time.Now(),
@@ -242,7 +250,7 @@ func (e *Engine) CheckSuspiciousPort(flows []models.Flow) {
 				ID:        fmt.Sprintf("port-%s-%d-%s", f.NodeID, f.DstPort, f.SrcIP),
 				Type:      models.AlertSuspiciousPort,
 				Severity:  models.SeverityCritical,
-				Message:   fmt.Sprintf("Traffic to suspicious port %d: %s:%d → %s:%d on node %s", f.DstPort, f.SrcIP, f.SrcPort, f.DstIP, f.DstPort, f.NodeID),
+				Message:   fmt.Sprintf("检测到访问可疑端口 %d：%s:%d → %s:%d，节点 %s", f.DstPort, f.SrcIP, f.SrcPort, f.DstIP, f.DstPort, f.NodeID),
 				SourceIP:  f.SrcIP,
 				NodeID:    f.NodeID,
 				Timestamp: time.Now(),
@@ -310,7 +318,7 @@ func (e *Engine) CheckPortScan(flows []models.Flow) {
 				ID:        fmt.Sprintf("scan-%s-%s", parts[0], parts[1]),
 				Type:      models.AlertPortScan,
 				Severity:  models.SeverityWarning,
-				Message:   fmt.Sprintf("Potential port scan from %s on node %s: %d ports scanned", parts[1], parts[0], len(state.dstPorts)),
+				Message:   fmt.Sprintf("疑似端口扫描：来源 %s，节点 %s，共扫描 %d 个端口", parts[1], parts[0], len(state.dstPorts)),
 				SourceIP:  parts[1],
 				NodeID:    parts[0],
 				Timestamp: now,
@@ -352,7 +360,7 @@ func (e *Engine) CheckDNSSuspiciousPort(flows []models.Flow) {
 			ID:        fmt.Sprintf("dnsport-%s-%d-%s", f.NodeID, f.DstPort, f.SrcIP),
 			Type:      models.AlertDNSSuspiciousPort,
 			Severity:  models.SeverityWarning,
-			Message:   fmt.Sprintf("DNS traffic on non-standard port %d: %s:%d -> %s:%d on node %s", f.DstPort, f.SrcIP, f.SrcPort, f.DstIP, f.DstPort, f.NodeID),
+			Message:   fmt.Sprintf("检测到非标准端口 DNS 流量 %d：%s:%d -> %s:%d，节点 %s", f.DstPort, f.SrcIP, f.SrcPort, f.DstIP, f.DstPort, f.NodeID),
 			SourceIP:  f.SrcIP,
 			NodeID:    f.NodeID,
 			Timestamp: time.Now(),
@@ -383,7 +391,7 @@ func (e *Engine) CheckFlowFlood(flows []models.Flow, nodeID string) {
 				ID:        fmt.Sprintf("flood-%s-%s", nodeID, srcIP),
 				Type:      models.AlertFlowFlood,
 				Severity:  models.SeverityCritical,
-				Message:   fmt.Sprintf("Flow flood from %s: %d concurrent flows on node %s", srcIP, count, nodeID),
+				Message:   fmt.Sprintf("检测到流量洪泛：%s 在节点 %s 上存在 %d 条并发流", srcIP, count, nodeID),
 				SourceIP:  srcIP,
 				NodeID:    nodeID,
 				Timestamp: time.Now(),
@@ -415,7 +423,7 @@ func (e *Engine) CheckDNSExfiltration(flows []models.Flow, dnsQueries []models.D
 				ID:        fmt.Sprintf("dnsx-%s-%s", f.NodeID, f.SrcIP),
 				Type:      models.AlertDNSExfiltration,
 				Severity:  models.SeverityCritical,
-				Message:   fmt.Sprintf("Possible DNS exfiltration: %s sent %d bytes via DNS (port %d) on node %s", f.SrcIP, f.Bytes, f.DstPort, f.NodeID),
+				Message:   fmt.Sprintf("疑似 DNS 外传：%s 通过 DNS（端口 %d）发送了 %d 字节，节点 %s", f.SrcIP, f.Bytes, f.DstPort, f.NodeID),
 				SourceIP:  f.SrcIP,
 				NodeID:    f.NodeID,
 				Timestamp: time.Now(),
@@ -440,7 +448,7 @@ func (e *Engine) CheckDNSExfiltration(flows []models.Flow, dnsQueries []models.D
 				ID:        fmt.Sprintf("dnslen-%s", q.QueryName[:min(16, len(q.QueryName))]),
 				Type:      models.AlertDNSExfiltration,
 				Severity:  models.SeverityWarning,
-				Message:   fmt.Sprintf("Suspicious long DNS query: %s (%d chars, %d queries)", q.QueryName, len(q.QueryName), q.Count),
+				Message:   fmt.Sprintf("可疑的超长 DNS 查询：%s（%d 个字符，%d 次查询）", q.QueryName, len(q.QueryName), q.Count),
 				Timestamp: time.Now(),
 			})
 		}
@@ -475,7 +483,7 @@ func (e *Engine) CheckICMPFlood(flows []models.Flow, nodeID string) {
 				ID:        fmt.Sprintf("icmp-%s-%s", nodeID, srcIP),
 				Type:      models.AlertICMPFlood,
 				Severity:  models.SeverityWarning,
-				Message:   fmt.Sprintf("ICMP flood from %s: %d flows on node %s", srcIP, count, nodeID),
+				Message:   fmt.Sprintf("检测到 ICMP 洪泛：%s 在节点 %s 上产生了 %d 条流", srcIP, count, nodeID),
 				SourceIP:  srcIP,
 				NodeID:    nodeID,
 				Timestamp: time.Now(),
@@ -525,7 +533,7 @@ func (e *Engine) CheckSYNFlood(flows []models.Flow, nodeID string) {
 				ID:        fmt.Sprintf("syn-%s-%s", nodeID, srcIP),
 				Type:      models.AlertSYNFlood,
 				Severity:  models.SeverityCritical,
-				Message:   fmt.Sprintf("Possible SYN flood from %s: %d tiny TCP flows to %d ports on node %s", srcIP, s.tinyFlows, len(s.destPorts), nodeID),
+				Message:   fmt.Sprintf("疑似 SYN 洪泛：%s 在节点 %s 上向 %d 个端口发起了 %d 条小型 TCP 流", srcIP, s.tinyFlows, len(s.destPorts), nodeID),
 				SourceIP:  srcIP,
 				NodeID:    nodeID,
 				Timestamp: time.Now(),
@@ -571,7 +579,7 @@ func (e *Engine) CheckHorizontalScan(flows []models.Flow) {
 				ID:        fmt.Sprintf("hscan-%s-%s-%s", nodeID, srcIP, port),
 				Type:      models.AlertHorizontalScan,
 				Severity:  models.SeverityWarning,
-				Message:   fmt.Sprintf("Horizontal scan: %s probed port %s on %d hosts (node %s)", srcIP, port, len(dstSet), nodeID),
+				Message:   fmt.Sprintf("水平扫描：%s 在节点 %s 上针对 %d 台主机探测了端口 %s", srcIP, nodeID, len(dstSet), port),
 				SourceIP:  srcIP,
 				NodeID:    nodeID,
 				Timestamp: now,
@@ -607,7 +615,7 @@ func (e *Engine) CheckDataExfiltration(hosts []models.Host, nodeID string) {
 				ID:        fmt.Sprintf("dx-%s-%s", nodeID, h.IP),
 				Type:      models.AlertDataExfiltration,
 				Severity:  models.SeverityCritical,
-				Message:   fmt.Sprintf("Possible data exfiltration from %s: %d bytes out / %d bytes in (ratio %.1f) on node %s", h.IP, h.BytesSent, h.BytesReceived, float64(h.BytesSent)/float64(h.BytesReceived), nodeID),
+				Message:   fmt.Sprintf("疑似数据外传：%s 在节点 %s 上发出 %d 字节 / 收入 %d 字节（比值 %.1f）", h.IP, nodeID, h.BytesSent, h.BytesReceived, float64(h.BytesSent)/float64(h.BytesReceived)),
 				SourceIP:  h.IP,
 				NodeID:    nodeID,
 				Timestamp: time.Now(),
@@ -643,7 +651,7 @@ func (e *Engine) CheckUnexpectedProtocol(flows []models.Flow) {
 			ID:        fmt.Sprintf("uproto-%s-%s-%s", f.NodeID, f.SrcIP, proto),
 			Type:      models.AlertUnexpectedProtocol,
 			Severity:  models.SeverityInfo,
-			Message:   fmt.Sprintf("Unexpected protocol '%s' from %s on node %s", proto, f.SrcIP, f.NodeID),
+			Message:   fmt.Sprintf("检测到异常协议 '%s'：来源 %s，节点 %s", proto, f.SrcIP, f.NodeID),
 			SourceIP:  f.SrcIP,
 			NodeID:    f.NodeID,
 			Timestamp: time.Now(),
@@ -688,7 +696,7 @@ func (e *Engine) CheckARPSpoof(flows []models.Flow, hosts []models.Host) {
 				ID:        fmt.Sprintf("arp-%s", ip),
 				Type:      models.AlertARPSpoof,
 				Severity:  models.SeverityCritical,
-				Message:   fmt.Sprintf("Possible ARP spoofing: IP %s has %d MAC addresses: %s", ip, len(macs), macList[:len(macList)-2]),
+				Message:   fmt.Sprintf("疑似 ARP 欺骗：IP %s 对应了 %d 个 MAC 地址：%s", ip, len(macs), macList[:len(macList)-2]),
 				SourceIP:  ip,
 				Timestamp: time.Now(),
 			})
@@ -724,7 +732,7 @@ func (e *Engine) CheckLongFlow(flows []models.Flow) {
 				ID:        fmt.Sprintf("long-%s-%s", f.NodeID, f.ID[:min(8, len(f.ID))]),
 				Type:      models.AlertLongFlow,
 				Severity:  models.SeverityInfo,
-				Message:   fmt.Sprintf("Long-running flow: %s:%d → %s:%d (%s) active for %.0fs on node %s", f.SrcIP, f.SrcPort, f.DstIP, f.DstPort, f.Protocol, duration, f.NodeID),
+				Message:   fmt.Sprintf("长时间活跃流：%s:%d → %s:%d（%s）已持续 %.0f 秒，节点 %s", f.SrcIP, f.SrcPort, f.DstIP, f.DstPort, f.Protocol, duration, f.NodeID),
 				SourceIP:  f.SrcIP,
 				NodeID:    f.NodeID,
 				Timestamp: now,

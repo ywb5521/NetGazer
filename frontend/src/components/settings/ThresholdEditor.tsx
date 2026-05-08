@@ -14,6 +14,13 @@ function parseCommaSep(v: string): number[] {
     .filter((n) => !isNaN(n) && n > 0);
 }
 
+function parseStringList(v: string): string[] {
+  return v
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
 const defaults: AlertThresholds = {
   banned_ports: [23, 3389, 445, 135, 139],
   port_scan_threshold: 20,
@@ -21,6 +28,7 @@ const defaults: AlertThresholds = {
   flow_flood_threshold: 100,
   alert_cooldown_min: 5,
   dns_suspicious_ports: null,
+  suppressed_alert_types: null,
 };
 
 export function ThresholdEditor() {
@@ -33,6 +41,7 @@ export function ThresholdEditor() {
   const [flowFloodThreshold, setFlowFloodThreshold] = useState('');
   const [alertCooldown, setAlertCooldown] = useState('');
   const [dnsSuspiciousPorts, setDnsSuspiciousPorts] = useState('');
+  const [suppressedAlertTypes, setSuppressedAlertTypes] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -41,13 +50,14 @@ export function ThresholdEditor() {
       .then((c) => {
         setConfig(c);
         setThresholdMbps(String(Math.round(c.bandwidth_threshold_bps / 1_000_000)));
-        const t = c.alert_thresholds || defaults;
-        setBannedPorts((t.banned_ports || []).join(', '));
-        setPortScanThreshold(String(t.port_scan_threshold));
-        setPortScanWindow(String(t.port_scan_window_sec));
-        setFlowFloodThreshold(String(t.flow_flood_threshold));
-        setAlertCooldown(String(t.alert_cooldown_min));
-        setDnsSuspiciousPorts((t.dns_suspicious_ports || []).join(', '));
+        const thresholds = c.alert_thresholds || defaults;
+        setBannedPorts((thresholds.banned_ports || []).join(', '));
+        setPortScanThreshold(String(thresholds.port_scan_threshold));
+        setPortScanWindow(String(thresholds.port_scan_window_sec));
+        setFlowFloodThreshold(String(thresholds.flow_flood_threshold));
+        setAlertCooldown(String(thresholds.alert_cooldown_min));
+        setDnsSuspiciousPorts((thresholds.dns_suspicious_ports || []).join(', '));
+        setSuppressedAlertTypes((thresholds.suppressed_alert_types || []).join(', '));
       })
       .catch(() => {});
   }, []);
@@ -56,7 +66,9 @@ export function ThresholdEditor() {
     const bps = parseFloat(thresholdMbps) * 1_000_000;
     if (isNaN(bps) || bps <= 0) return;
 
+    const currentThresholds = config?.alert_thresholds || defaults;
     const thresholds: AlertThresholds = {
+      ...currentThresholds,
       banned_ports: parseCommaSep(bannedPorts),
       port_scan_threshold: parseInt(portScanThreshold, 10) || defaults.port_scan_threshold,
       port_scan_window_sec: parseInt(portScanWindow, 10) || defaults.port_scan_window_sec,
@@ -64,6 +76,9 @@ export function ThresholdEditor() {
       alert_cooldown_min: parseInt(alertCooldown, 10) || defaults.alert_cooldown_min,
       dns_suspicious_ports: dnsSuspiciousPorts.trim()
         ? parseCommaSep(dnsSuspiciousPorts)
+        : null,
+      suppressed_alert_types: suppressedAlertTypes.trim()
+        ? parseStringList(suppressedAlertTypes)
         : null,
     };
 
@@ -86,6 +101,7 @@ export function ThresholdEditor() {
     setFlowFloodThreshold(String(defaults.flow_flood_threshold));
     setAlertCooldown(String(defaults.alert_cooldown_min));
     setDnsSuspiciousPorts('');
+    setSuppressedAlertTypes('');
   };
 
   const inputCls = 'w-24 h-8 text-xs';
@@ -101,7 +117,6 @@ export function ThresholdEditor() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Bandwidth */}
         <div className="flex items-end gap-3">
           <div className="space-y-1">
             <label className={labelCls}>{t.settings.bandwidthThreshold}</label>
@@ -115,46 +130,46 @@ export function ThresholdEditor() {
         </div>
 
         <div className="border-t border-border pt-3 grid grid-cols-2 gap-3">
-          {/* Banned Ports */}
           <div className="space-y-1 col-span-2">
             <label className={labelCls}>{t.settings.bannedPorts}</label>
             <Input value={bannedPorts} onChange={(e) => setBannedPorts(e.target.value)} className="w-full h-8 text-xs font-mono" placeholder={t.settings.bannedPortsPlaceholder} />
             <p className={hintCls}>{t.settings.bannedPortsDesc}</p>
           </div>
 
-          {/* Port Scan Threshold */}
           <div className="space-y-1">
             <label className={labelCls}>{t.settings.portScanThreshold}</label>
             <Input type="number" value={portScanThreshold} onChange={(e) => setPortScanThreshold(e.target.value)} className={inputCls} min={1} max={1000} />
             <p className={hintCls}>{t.settings.portScanThresholdDesc}</p>
           </div>
 
-          {/* Port Scan Window */}
           <div className="space-y-1">
             <label className={labelCls}>{t.settings.portScanWindow}</label>
             <Input type="number" value={portScanWindow} onChange={(e) => setPortScanWindow(e.target.value)} className={inputCls} min={10} max={600} />
             <p className={hintCls}>{t.settings.portScanWindowDesc}</p>
           </div>
 
-          {/* Flow Flood Threshold */}
           <div className="space-y-1">
             <label className={labelCls}>{t.settings.flowFloodThreshold}</label>
             <Input type="number" value={flowFloodThreshold} onChange={(e) => setFlowFloodThreshold(e.target.value)} className={inputCls} min={1} max={10000} />
             <p className={hintCls}>{t.settings.flowFloodThresholdDesc}</p>
           </div>
 
-          {/* Alert Cooldown */}
           <div className="space-y-1">
             <label className={labelCls}>{t.settings.alertCooldown}</label>
             <Input type="number" value={alertCooldown} onChange={(e) => setAlertCooldown(e.target.value)} className={inputCls} min={1} max={1440} />
             <p className={hintCls}>{t.settings.alertCooldownDesc}</p>
           </div>
 
-          {/* DNS Suspicious Ports */}
           <div className="space-y-1 col-span-2">
             <label className={labelCls}>{t.settings.dnsSuspiciousPorts}</label>
             <Input value={dnsSuspiciousPorts} onChange={(e) => setDnsSuspiciousPorts(e.target.value)} className="w-full h-8 text-xs font-mono" placeholder={t.settings.dnsSuspiciousPortsPlaceholder} />
             <p className={hintCls}>{t.settings.dnsSuspiciousPortsDesc}</p>
+          </div>
+
+          <div className="space-y-1 col-span-2">
+            <label className={labelCls}>{t.settings.suppressedAlertTypes}</label>
+            <Input value={suppressedAlertTypes} onChange={(e) => setSuppressedAlertTypes(e.target.value)} className="w-full h-8 text-xs font-mono" placeholder={t.settings.suppressedAlertTypesPlaceholder} />
+            <p className={hintCls}>{t.settings.suppressedAlertTypesDesc}</p>
           </div>
         </div>
 

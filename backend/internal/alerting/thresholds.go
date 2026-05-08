@@ -1,12 +1,13 @@
 package alerting
 
 type AlertThresholds struct {
-	BannedPorts             []uint16 `json:"banned_ports"`
-	PortScanThreshold       int      `json:"port_scan_threshold"`
-	PortScanWindowSec       int      `json:"port_scan_window_sec"`
-	FlowFloodThreshold      int      `json:"flow_flood_threshold"`
-	AlertCooldownMin        int      `json:"alert_cooldown_min"`
-	DNSSuspiciousPorts      []uint16 `json:"dns_suspicious_ports"`
+	BannedPorts          []uint16 `json:"banned_ports"`
+	PortScanThreshold    int      `json:"port_scan_threshold"`
+	PortScanWindowSec    int      `json:"port_scan_window_sec"`
+	FlowFloodThreshold   int      `json:"flow_flood_threshold"`
+	AlertCooldownMin     int      `json:"alert_cooldown_min"`
+	DNSSuspiciousPorts   []uint16 `json:"dns_suspicious_ports"`
+	SuppressedAlertTypes []string `json:"suppressed_alert_types"`
 	// Extended behavioral alerts
 	DNSExfilQueryMinLen     int      `json:"dns_exfil_query_min_len"`
 	DNSExfilMinBytes        uint64   `json:"dns_exfil_min_bytes"`

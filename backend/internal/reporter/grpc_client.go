@@ -29,20 +29,20 @@ type IfacePipe struct {
 }
 
 type GRPCClient struct {
-	serverAddr   string
-	conn         *grpc.ClientConn
-	client       netgazerv1.AgentServiceClient
-	stream       netgazerv1.AgentService_StreamSnapshotsClient
-	nodeID       string
-	ifacePipes   []*IfacePipe
-	version      string
-	tags         []string
-	interval     time.Duration
-	systemHealth *agenthealth.Health
-	tlsCert      string
-	tlsKey       string
-	tlsCA        string
-	authToken    string
+	serverAddr       string
+	conn             *grpc.ClientConn
+	client           netgazerv1.AgentServiceClient
+	stream           netgazerv1.AgentService_StreamSnapshotsClient
+	nodeID           string
+	ifacePipes       []*IfacePipe
+	version          string
+	tags             []string
+	interval         time.Duration
+	systemHealth     *agenthealth.Health
+	tlsCert          string
+	tlsKey           string
+	tlsCA            string
+	authToken        string
 	onInterceptRules func(rules []*netgazerv1.InterceptRule)
 }
 
@@ -334,19 +334,18 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 		SizeGt1500: psd.SizeGt1500,
 	}
 
-
-		tcpSummary := pipe.TCPMetrics.Snapshot()
-		pbTCP := &netgazerv1.TCPMetrics{
-			ActiveTcpFlows:   int32(tcpSummary.ActiveTCPFlows),
-			TotalRetransmits: tcpSummary.TotalRetransmits,
-			TotalRsts:        tcpSummary.TotalRSTs,
-			TotalZeroWindows: tcpSummary.TotalZeroWindows,
-			TotalOutOfOrder:  tcpSummary.TotalOutOfOrder,
-			RttAvgMs:         tcpSummary.RTTAvgMS,
-			RttMinMs:         tcpSummary.RTTMinMS,
-			RttMaxMs:         tcpSummary.RTTMaxMS,
-			RttSamples:       tcpSummary.RTTSamples,
-		}
+	tcpSummary := pipe.TCPMetrics.Snapshot()
+	pbTCP := &netgazerv1.TCPMetrics{
+		ActiveTcpFlows:   int32(tcpSummary.ActiveTCPFlows),
+		TotalRetransmits: tcpSummary.TotalRetransmits,
+		TotalRsts:        tcpSummary.TotalRSTs,
+		TotalZeroWindows: tcpSummary.TotalZeroWindows,
+		TotalOutOfOrder:  tcpSummary.TotalOutOfOrder,
+		RttAvgMs:         tcpSummary.RTTAvgMS,
+		RttMinMs:         tcpSummary.RTTMinMS,
+		RttMaxMs:         tcpSummary.RTTMaxMS,
+		RttSamples:       tcpSummary.RTTSamples,
+	}
 	msg := &netgazerv1.AgentMessage{
 		NodeId:          c.nodeID,
 		TimestampUnixMs: now.UnixMilli(),
@@ -361,7 +360,7 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 		Protocols:      pbProtocols,
 		DnsQueries:     pbDNS,
 		PacketSizeDist: pbPSD,
-			TcpMetrics:     pbTCP,
+		TcpMetrics:     pbTCP,
 	}
 
 	// System health is per-node, only attach on first interface to avoid duplication

@@ -14,9 +14,9 @@ type ASNInfo struct {
 // Built-in ASN mapping for common private/well-known prefixes.
 // Production deployments should use a MaxMind GeoLite2 ASN database or similar.
 var builtinASN = []struct {
-	prefix  string // CIDR notation
-	asn     uint32
-	org     string
+	prefix string // CIDR notation
+	asn    uint32
+	org    string
 }{
 	// RFC 1918 private ranges — mapped to local AS
 	{"10.0.0.0/8", 0, "Private (RFC 1918)"},
@@ -60,8 +60,8 @@ var builtinASN = []struct {
 
 // CIDR entries from builtinASN, pre-parsed for fast lookup.
 var (
-	parsedASN     []*asnEntry
-	parseASNOnce  sync.Once
+	parsedASN    []*asnEntry
+	parseASNOnce sync.Once
 )
 
 type asnEntry struct {

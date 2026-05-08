@@ -128,7 +128,7 @@ func main() {
 		log.Printf("[agent] starting pipeline for %s", ifaceName)
 
 		var analyzer *capture.Analyzer
-		if ogfwDetector != nil && ndpiEngine != nil {
+		if ogfwDetector != nil {
 			analyzer = capture.NewAnalyzerWithOpenGFW(ndpiEngine, ogfwDetector, cfg.ProtoEngine)
 		} else if ndpiEngine != nil {
 			analyzer = capture.NewAnalyzerWithNDPI(ndpiEngine)

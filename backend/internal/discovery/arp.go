@@ -29,15 +29,15 @@ func arpPacket(srcMAC net.HardwareAddr, srcIP, targetIP net.IP) ([]byte, error) 
 
 	// ARP header
 	offset := 14
-	binary.BigEndian.PutUint16(pkt[offset:offset+2], 1)     // HTYPE Ethernet
+	binary.BigEndian.PutUint16(pkt[offset:offset+2], 1)        // HTYPE Ethernet
 	binary.BigEndian.PutUint16(pkt[offset+2:offset+4], 0x0800) // PTYPE IPv4
-	pkt[offset+4] = 6  // HLEN
-	pkt[offset+5] = 4  // PLEN
-	binary.BigEndian.PutUint16(pkt[offset+6:offset+8], 1)    // OPER request
-	copy(pkt[offset+8:offset+14], srcMAC[:6])                 // SHA
-	copy(pkt[offset+14:offset+18], srcIP.To4()[:4])           // SPA
+	pkt[offset+4] = 6                                          // HLEN
+	pkt[offset+5] = 4                                          // PLEN
+	binary.BigEndian.PutUint16(pkt[offset+6:offset+8], 1)      // OPER request
+	copy(pkt[offset+8:offset+14], srcMAC[:6])                  // SHA
+	copy(pkt[offset+14:offset+18], srcIP.To4()[:4])            // SPA
 	// THA left as zeros (unknown)
-	copy(pkt[offset+24:offset+28], targetIP.To4()[:4])        // TPA
+	copy(pkt[offset+24:offset+28], targetIP.To4()[:4]) // TPA
 
 	return pkt, nil
 }

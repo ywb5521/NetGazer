@@ -9,8 +9,8 @@ import (
 
 // DecapsulatedPacket holds inner packets extracted from tunnel protocols.
 type DecapsulatedPacket struct {
-	InnerIP   net.IP
-	InnerData []byte
+	InnerIP    net.IP
+	InnerData  []byte
 	TunnelType string // "GRE", "GTP-U"
 }
 

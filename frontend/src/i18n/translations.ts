@@ -126,6 +126,10 @@ export interface Translations {
     allProto: string;
     allApps: string;
     minBytes: string;
+    sortBytesDesc: string;
+    sortBytesAsc: string;
+    sortPacketsDesc: string;
+    sortRecentActive: string;
     prev: string;
     next: string;
     page: string;
@@ -157,6 +161,17 @@ export interface Translations {
     acked: string;
     ack: string;
     noAlerts: string;
+    searchPlaceholder: string;
+    newest: string;
+    oldest: string;
+    ackPage: string;
+    exportTime: string;
+    exportType: string;
+    exportSeverity: string;
+    exportMessage: string;
+    exportSourceIp: string;
+    exportNode: string;
+    exportAcknowledged: string;
     page: string;
     of: string;
     prev: string;
@@ -257,6 +272,9 @@ export interface Translations {
     dnsSuspiciousPorts: string;
     dnsSuspiciousPortsPlaceholder: string;
     dnsSuspiciousPortsDesc: string;
+    suppressedAlertTypes: string;
+    suppressedAlertTypesPlaceholder: string;
+    suppressedAlertTypesDesc: string;
     resetToDefaults: string;
     bpfFilter: string;
     bpfFilterDesc: string;
@@ -581,6 +599,10 @@ export const zh: Translations = {
     allProto: '全部协议',
     allApps: '全部应用',
     minBytes: '最小字节',
+    sortBytesDesc: '字节 ↓',
+    sortBytesAsc: '字节 ↑',
+    sortPacketsDesc: '数据包 ↓',
+    sortRecentActive: '最近活跃',
     prev: '上一页',
     next: '下一页',
     page: '页',
@@ -612,6 +634,17 @@ export const zh: Translations = {
     acked: '已确认',
     ack: '确认',
     noAlerts: '暂无告警',
+    searchPlaceholder: '搜索告警...',
+    newest: '最新优先',
+    oldest: '最早优先',
+    ackPage: '确认本页',
+    exportTime: '时间',
+    exportType: '类型',
+    exportSeverity: '级别',
+    exportMessage: '消息',
+    exportSourceIp: '源 IP',
+    exportNode: '节点',
+    exportAcknowledged: '已确认',
     page: '页',
     of: '/',
     prev: '上一页',
@@ -712,6 +745,9 @@ export const zh: Translations = {
     dnsSuspiciousPorts: 'DNS 可疑端口 (逗号分隔，空 = 所有非 53 端口)',
     dnsSuspiciousPortsPlaceholder: '空 = 标记所有非 53 端口',
     dnsSuspiciousPortsDesc: '当 DNS 流量出现在这些端口时被标记。留空则标记所有非 53 端口。',
+    suppressedAlertTypes: '压制的告警类型 (逗号分隔)',
+    suppressedAlertTypesPlaceholder: '例如: port_scan, dns_exfiltration',
+    suppressedAlertTypesDesc: '这些类型后续将不再生成、入库或发送通知。',
     resetToDefaults: '恢复默认值',
     bpfFilter: 'BPF 捕获过滤器',
     bpfFilterDesc: '应用于所有 Agent 的 Berkeley Packet Filter 表达式。只捕获匹配的数据包。留空则捕获所有流量。常见示例: tcp port 80, not host 10.0.0.1, net 192.168.1.0/24。',

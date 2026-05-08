@@ -16,16 +16,36 @@ const severityVariant: Record<string, 'destructive' | 'secondary' | 'outline'> =
   info: 'outline',
 };
 
+const alertTypeLabels: Record<string, { zh: string; en: string }> = {
+  high_bandwidth: { zh: '高带宽占用', en: 'High bandwidth' },
+  new_device: { zh: '新设备', en: 'New device' },
+  suspicious_port: { zh: '可疑端口', en: 'Suspicious port' },
+  flow_flood: { zh: '流量洪泛', en: 'Flow flood' },
+  port_scan: { zh: '端口扫描', en: 'Port scan' },
+  dns_suspicious_port: { zh: 'DNS 非标准端口', en: 'DNS suspicious port' },
+  dns_exfiltration: { zh: 'DNS 外传', en: 'DNS exfiltration' },
+  icmp_flood: { zh: 'ICMP 洪泛', en: 'ICMP flood' },
+  syn_flood: { zh: 'SYN 洪泛', en: 'SYN flood' },
+  horizontal_scan: { zh: '水平扫描', en: 'Horizontal scan' },
+  data_exfiltration: { zh: '数据外传', en: 'Data exfiltration' },
+  unexpected_protocol: { zh: '异常协议', en: 'Unexpected protocol' },
+  arp_spoof: { zh: 'ARP 欺骗', en: 'ARP spoofing' },
+  long_flow: { zh: '长连接', en: 'Long-running flow' },
+  test: { zh: '测试通知', en: 'Test notification' },
+};
+
 const PAGE_SIZE = 20;
 
 export default function AlertsPage() {
   const { snapshot, ackAlert, selectedNode } = useAppContext();
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [severityFilter, setSeverityFilter] = useLocalStorage('netgazer-alerts-severity', 'all');
   const [typeFilter, setTypeFilter] = useLocalStorage('netgazer-alerts-type', 'all');
   const [searchText, setSearchText] = useState('');
   const [sortNewest, setSortNewest] = useState(true);
   const [page, setPage] = useState(0);
+
+  const labelAlertType = (value: string) => alertTypeLabels[value]?.[lang] || value.replace(/_/g, ' ');
 
   const alertTypes = useMemo(() => {
     if (!snapshot) return [];
@@ -43,6 +63,7 @@ export default function AlertsPage() {
       const q = searchText.toLowerCase();
       list = list.filter((a) =>
         a.message.toLowerCase().includes(q) ||
+        a.type.toLowerCase().includes(q) ||
         (a.source_ip && a.source_ip.includes(q)) ||
         a.node_id.toLowerCase().includes(q)
       );
@@ -66,9 +87,9 @@ export default function AlertsPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">{t.alerts.title} ({filtered.length})</h1>
         <Button variant="outline" size="sm" disabled={filtered.length === 0} onClick={() => {
-          const headers = ['Time', 'Type', 'Severity', 'Message', 'Source IP', 'Node', 'Acknowledged'];
+          const headers = [t.alerts.exportTime, t.alerts.exportType, t.alerts.exportSeverity, t.alerts.exportMessage, t.alerts.exportSourceIp, t.alerts.exportNode, t.alerts.exportAcknowledged];
           const rows = filtered.map((a) => [
-            new Date(a.timestamp).toISOString(), a.type, a.severity, a.message,
+            new Date(a.timestamp).toISOString(), labelAlertType(a.type), severityLabel[a.severity] || a.severity, a.message,
             a.source_ip || '', a.node_id, String(a.acknowledged),
           ]);
           exportCSV(headers, rows, `alerts-${new Date().toISOString().slice(0, 10)}.csv`);
@@ -81,7 +102,7 @@ export default function AlertsPage() {
         <div className="relative w-56">
           <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
           <Input
-            placeholder="Search alerts..."
+            placeholder={t.alerts.searchPlaceholder}
             value={searchText}
             onChange={(e) => { setSearchText(e.target.value); setPage(0); }}
             className="pl-7 h-8 text-xs"
@@ -106,7 +127,7 @@ export default function AlertsPage() {
           <SelectContent>
             <SelectItem value="all">{t.alerts.allTypes}</SelectItem>
             {alertTypes.map((at) => (
-              <SelectItem key={at} value={at}>{at.replace(/_/g, ' ')}</SelectItem>
+              <SelectItem key={at} value={at}>{labelAlertType(at)}</SelectItem>
             ))}
           </SelectContent>
         </Select>
@@ -118,7 +139,7 @@ export default function AlertsPage() {
           onClick={() => setSortNewest(!sortNewest)}
         >
           <ArrowUpDown className="mr-1 h-3 w-3" />
-          {sortNewest ? 'Newest' : 'Oldest'}
+          {sortNewest ? t.alerts.newest : t.alerts.oldest}
         </Button>
 
         {paged.some((a) => !a.acknowledged) && (
@@ -129,7 +150,7 @@ export default function AlertsPage() {
             onClick={() => paged.filter((a) => !a.acknowledged).forEach((a) => ackAlert(a.id))}
           >
             <CheckCheck className="mr-1 h-3 w-3" />
-            Ack Page
+            {t.alerts.ackPage}
           </Button>
         )}
       </div>
@@ -149,7 +170,7 @@ export default function AlertsPage() {
                         {severityLabel[alert.severity] || alert.severity}
                       </Badge>
                       <Badge variant="outline" className="text-xs">
-                        {alert.type}
+                        {labelAlertType(alert.type)}
                       </Badge>
                       {alert.acknowledged && (
                         <Badge variant="outline" className="text-muted-foreground text-xs">

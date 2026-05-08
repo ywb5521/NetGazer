@@ -7,17 +7,17 @@ import (
 
 // RTPPacketInfo holds RTP packet fields for VoIP tracking.
 type RTPPacketInfo struct {
-	SrcIP    string
-	DstIP    string
-	SrcPort  uint16
-	DstPort  uint16
-	SSRC     uint32
-	SeqNum   uint16
-	RTPTS    uint32
-	PT       uint8
-	Size     int
-	Arrival  time.Time
-	Codec    string
+	SrcIP   string
+	DstIP   string
+	SrcPort uint16
+	DstPort uint16
+	SSRC    uint32
+	SeqNum  uint16
+	RTPTS   uint32
+	PT      uint8
+	Size    int
+	Arrival time.Time
+	Codec   string
 }
 
 type rtpSession struct {
@@ -45,14 +45,14 @@ type rtpSession struct {
 
 // VOIPTracker tracks RTP flows and computes VoIP quality metrics.
 type VOIPTracker struct {
-	mu       sync.Mutex
-	sessions map[uint32]*rtpSession // keyed by SSRC
+	mu          sync.Mutex
+	sessions    map[uint32]*rtpSession // keyed by SSRC
 	maxSessions int
 }
 
 func NewVOIPTracker() *VOIPTracker {
 	return &VOIPTracker{
-		sessions: make(map[uint32]*rtpSession),
+		sessions:    make(map[uint32]*rtpSession),
 		maxSessions: 4096,
 	}
 }
@@ -95,7 +95,7 @@ func (t *VOIPTracker) Process(info RTPPacketInfo) {
 	// J(i) = J(i-1) + (|D(i-1,i)| - J(i-1)) / 16
 	if !sess.LastArrival.IsZero() && sess.LastRTPTS != 0 {
 		arrivalDelta := info.Arrival.Sub(sess.LastArrival).Seconds() * 1000 // ms
-		rtpDelta := float64(int32(info.RTPTS-sess.LastRTPTS)) / 8.0        // ms (8kHz typical)
+		rtpDelta := float64(int32(info.RTPTS-sess.LastRTPTS)) / 8.0         // ms (8kHz typical)
 
 		if rtpDelta < 0 {
 			rtpDelta += 65536 / 8.0 // handle 16-bit rollover
@@ -350,7 +350,7 @@ func ParseRTPFromPayload(payload []byte) *RTPPacketInfo {
 	codec := codecForPT(pt)
 
 	return &RTPPacketInfo{
-		SSRC:  ssrc,
+		SSRC:   ssrc,
 		SeqNum: seq,
 		RTPTS:  ts,
 		PT:     pt,

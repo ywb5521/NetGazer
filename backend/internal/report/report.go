@@ -18,48 +18,48 @@ func NewGenerator(store *storage.Store) *Generator {
 
 // SummaryReport is a high-level overview for a time range.
 type SummaryReport struct {
-	From         time.Time               `json:"from"`
-	To           time.Time               `json:"to"`
-	TotalBytes   float64                 `json:"total_bytes"`
-	AvgBps       float64                 `json:"avg_bps"`
-	PeakBps      float64                 `json:"peak_bps"`
-	UniqueHosts  int                     `json:"unique_hosts"`
-	TotalFlows   int                     `json:"total_flows"`
-	AlertCount   int                     `json:"alert_count"`
+	From        time.Time `json:"from"`
+	To          time.Time `json:"to"`
+	TotalBytes  float64   `json:"total_bytes"`
+	AvgBps      float64   `json:"avg_bps"`
+	PeakBps     float64   `json:"peak_bps"`
+	UniqueHosts int       `json:"unique_hosts"`
+	TotalFlows  int       `json:"total_flows"`
+	AlertCount  int       `json:"alert_count"`
 }
 
 // TopTalker is a host with aggregate traffic stats.
 type TopTalker struct {
-	IP             string  `json:"ip"`
-	Hostname       string  `json:"hostname"`
-	TotalBytes     float64 `json:"total_bytes"`
-	BytesSent      float64 `json:"bytes_sent"`
-	BytesReceived  float64 `json:"bytes_received"`
-	FlowCount      int     `json:"flow_count"`
+	IP            string  `json:"ip"`
+	Hostname      string  `json:"hostname"`
+	TotalBytes    float64 `json:"total_bytes"`
+	BytesSent     float64 `json:"bytes_sent"`
+	BytesReceived float64 `json:"bytes_received"`
+	FlowCount     int     `json:"flow_count"`
 }
 
 // TopProtocol is an application protocol with aggregate stats.
 type TopProtocol struct {
-	Name      string  `json:"name"`
+	Name       string  `json:"name"`
 	TotalBytes float64 `json:"total_bytes"`
-	PctBytes  float64 `json:"pct_bytes"`
-	FlowCount int     `json:"flow_count"`
+	PctBytes   float64 `json:"pct_bytes"`
+	FlowCount  int     `json:"flow_count"`
 }
 
 // AlertSummary groups alerts by type and severity.
 type AlertSummary struct {
-	Total    int            `json:"total"`
-	ByType   map[string]int `json:"by_type"`
+	Total      int            `json:"total"`
+	ByType     map[string]int `json:"by_type"`
 	BySeverity map[string]int `json:"by_severity"`
-	Recent   []models.Alert `json:"recent"`
+	Recent     []models.Alert `json:"recent"`
 }
 
 // TrendPoint is a single data point in a traffic trend.
 type TrendPoint struct {
-	Timestamp    time.Time `json:"timestamp"`
-	BytesPerSec  float64   `json:"bytes_per_sec"`
-	PacketsPerSec float64  `json:"packets_per_sec"`
-	FlowsCount   int       `json:"flows_count"`
+	Timestamp     time.Time `json:"timestamp"`
+	BytesPerSec   float64   `json:"bytes_per_sec"`
+	PacketsPerSec float64   `json:"packets_per_sec"`
+	FlowsCount    int       `json:"flows_count"`
 }
 
 // GenerateSummary generates a summary report for the given time range.

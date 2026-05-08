@@ -13,22 +13,22 @@ import (
 )
 
 type ParsedPacket struct {
-	Timestamp   int64
-	SrcIP       net.IP
-	DstIP       net.IP
-	SrcMAC      net.HardwareAddr
-	DstMAC      net.HardwareAddr
-	SrcPort     uint16
-	DstPort     uint16
-	Length      int
-	Protocol    string
-	AppProto    string
-	DNSQuery    string
-	TLSSNI      string
-	HTTPHost    string
-	HTTPURL     string
-	HTTPStatus  int
-	Interface   string
+	Timestamp  int64
+	SrcIP      net.IP
+	DstIP      net.IP
+	SrcMAC     net.HardwareAddr
+	DstMAC     net.HardwareAddr
+	SrcPort    uint16
+	DstPort    uint16
+	Length     int
+	Protocol   string
+	AppProto   string
+	DNSQuery   string
+	TLSSNI     string
+	HTTPHost   string
+	HTTPURL    string
+	HTTPStatus int
+	Interface  string
 	// TCP-level fields
 	TCPSeq    uint32
 	TCPAck    uint32
@@ -41,9 +41,9 @@ type ParsedPacket struct {
 }
 
 type Analyzer struct {
-	ndpiEngine    *ndpi.Engine
-	ogfwDetector  *OGFWDetector
-	protoEngine   string // "ndpi", "opengfw", "both"
+	ndpiEngine   *ndpi.Engine
+	ogfwDetector *OGFWDetector
+	protoEngine  string // "ndpi", "opengfw", "both"
 }
 
 func NewAnalyzer() *Analyzer {
@@ -220,6 +220,9 @@ func (a *Analyzer) classifyApp(srcPort, dstPort uint16, payload []byte, transpor
 	if a.ndpiEngine != nil && p.SrcIP != nil && p.DstIP != nil {
 		proto := a.classifyNDPI(p, srcPort, dstPort, transport, packet)
 		if proto != "" && proto != "Unknown" {
+			if ogfwSaved != nil && ogfwSaved.ProtoName == "Encrypted" {
+				return proto + " (Encrypted)"
+			}
 			return proto
 		}
 	}

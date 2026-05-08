@@ -37,15 +37,15 @@ type CustomOID struct {
 
 // InterfaceStat holds per-interface SNMP data.
 type InterfaceStat struct {
-	Index      int
-	Name       string
-	Alias      string
-	InOctets   uint64
-	OutOctets  uint64
-	InErrors   uint64
-	OutErrors  uint64
-	Speed      uint64
-	OperStatus int // 1=up, 2=down
+	Index       int
+	Name        string
+	Alias       string
+	InOctets    uint64
+	OutOctets   uint64
+	InErrors    uint64
+	OutErrors   uint64
+	Speed       uint64
+	OperStatus  int // 1=up, 2=down
 	AdminStatus int
 }
 
