@@ -2,7 +2,6 @@ package capture
 
 import (
 	"context"
-	"log"
 	"net"
 	"strconv"
 	"strings"
@@ -205,7 +204,6 @@ func (a *Analyzer) classifyApp(srcPort, dstPort uint16, payload []byte, transpor
 	if a.ogfwDetector != nil && (a.protoEngine == "opengfw" || a.protoEngine == "both") {
 		ogfwSaved = a.ogfwDetector.AnalyzePacket(p.SrcIP, p.DstIP, srcPort, dstPort, payload, transport)
 		if ogfwSaved != nil && ogfwSaved.ProtoName != "" {
-			log.Printf("[agent] ogfw hit transport=%s proto=%s src=%s:%d dst=%s:%d", transport, ogfwSaved.ProtoName, p.SrcIP, srcPort, p.DstIP, dstPort)
 			a.enrichFromOGFW(ogfwSaved, p)
 			if a.protoEngine == "opengfw" {
 				return ogfwSaved.ProtoName
