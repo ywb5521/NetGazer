@@ -101,6 +101,8 @@ func (d *OGFWDetector) AnalyzePacket(srcIP, dstIP net.IP, srcPort, dstPort uint1
 	rev := key.srcIP != srcIP.String() || key.srcPort != srcPort
 
 	d.mu.Lock()
+	defer d.mu.Unlock()
+
 	state, exists := d.flows[key]
 	if !exists {
 		state = &ogfwFlowState{
@@ -124,7 +126,6 @@ func (d *OGFWDetector) AnalyzePacket(srcIP, dstIP net.IP, srcPort, dstPort uint1
 		}
 		d.flows[key] = state
 	}
-	d.mu.Unlock()
 
 	if state.done {
 		return nil

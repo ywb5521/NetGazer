@@ -119,7 +119,11 @@ func (is *ifaceState) UpdateFrom(nodeID string, msg *netgazerv1.AgentMessage) {
 			existing.Packets += f.Packets
 			existing.LastSeen = time.UnixMilli(f.LastSeenUnixMs)
 			if f.AppProtocol != "" && f.AppProtocol != f.Protocol {
-				existing.AppProtocol = f.AppProtocol
+				if strings.Contains(existing.AppProtocol, "Encrypted") && !strings.Contains(f.AppProtocol, "Encrypted") {
+					existing.AppProtocol = f.AppProtocol + " (Encrypted)"
+				} else {
+					existing.AppProtocol = f.AppProtocol
+				}
 			}
 		} else {
 			is.Flows[f.Id] = &models.Flow{

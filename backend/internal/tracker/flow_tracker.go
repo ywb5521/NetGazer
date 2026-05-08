@@ -3,6 +3,7 @@ package tracker
 import (
 	"crypto/md5"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -55,10 +56,14 @@ func (t *FlowTracker) Process(p capture.ParsedPacket, nodeID string) {
 	f.Bytes += uint64(p.Length)
 	f.Packets++
 	f.LastSeen = now
-	// Prefer more detailed app protocol (enriched with SNI/Host)
+	// Prefer more detailed app protocol (enriched with SNI/Host), but preserve encrypted marker.
 	if p.AppProto != "" && p.AppProto != p.Protocol {
 		if f.AppProtocol == p.Protocol || len(p.AppProto) > len(f.AppProtocol) {
-			f.AppProtocol = p.AppProto
+			if strings.Contains(f.AppProtocol, "Encrypted") && !strings.Contains(p.AppProto, "Encrypted") {
+				f.AppProtocol = p.AppProto + " (Encrypted)"
+			} else {
+				f.AppProtocol = p.AppProto
+			}
 		}
 	}
 }
