@@ -33,6 +33,15 @@ func (k flowKey) String() string {
 	return fmt.Sprintf("%s:%d-%s:%d/%s", k.srcIP, k.srcPort, k.dstIP, k.dstPort, k.proto)
 }
 
+func canonicalFlowKey(srcIP, dstIP net.IP, srcPort, dstPort uint16, transport string) flowKey {
+	src := srcIP.String()
+	dst := dstIP.String()
+	if src < dst || (src == dst && srcPort <= dstPort) {
+		return flowKey{srcIP: src, dstIP: dst, srcPort: srcPort, dstPort: dstPort, proto: transport}
+	}
+	return flowKey{srcIP: dst, dstIP: src, srcPort: dstPort, dstPort: srcPort, proto: transport}
+}
+
 // ogfwFlowState tracks the analyzer streams for a single flow.
 type ogfwFlowState struct {
 	info        analyzer.TCPInfo
@@ -88,13 +97,8 @@ func (d *OGFWDetector) AnalyzePacket(srcIP, dstIP net.IP, srcPort, dstPort uint1
 		return nil
 	}
 
-	key := flowKey{
-		srcIP:   srcIP.String(),
-		dstIP:   dstIP.String(),
-		srcPort: srcPort,
-		dstPort: dstPort,
-		proto:   transport,
-	}
+	key := canonicalFlowKey(srcIP, dstIP, srcPort, dstPort, transport)
+	rev := key.srcIP != srcIP.String() || key.srcPort != srcPort
 
 	d.mu.Lock()
 	state, exists := d.flows[key]
@@ -105,17 +109,17 @@ func (d *OGFWDetector) AnalyzePacket(srcIP, dstIP net.IP, srcPort, dstPort uint1
 		}
 		if transport == "TCP" {
 			state.info = analyzer.TCPInfo{
-				SrcIP:   srcIP,
-				DstIP:   dstIP,
-				SrcPort: srcPort,
-				DstPort: dstPort,
+				SrcIP:   net.ParseIP(key.srcIP),
+				DstIP:   net.ParseIP(key.dstIP),
+				SrcPort: key.srcPort,
+				DstPort: key.dstPort,
 			}
 		} else {
 			state.udpInfo = analyzer.UDPInfo{
-				SrcIP:   srcIP,
-				DstIP:   dstIP,
-				SrcPort: srcPort,
-				DstPort: dstPort,
+				SrcIP:   net.ParseIP(key.srcIP),
+				DstIP:   net.ParseIP(key.dstIP),
+				SrcPort: key.srcPort,
+				DstPort: key.dstPort,
 			}
 		}
 		d.flows[key] = state
@@ -133,20 +137,20 @@ func (d *OGFWDetector) AnalyzePacket(srcIP, dstIP net.IP, srcPort, dstPort uint1
 	}
 
 	if transport == "TCP" {
-		result := d.analyzeTCP(state, payload)
-		if result != nil {
+		result, terminal := d.analyzeTCP(state, payload, rev)
+		if terminal {
 			state.done = true
 		}
 		return result
 	}
-	result := d.analyzeUDP(state, payload)
-	if result != nil {
+	result, terminal := d.analyzeUDP(state, payload, rev)
+	if terminal {
 		state.done = true
 	}
 	return result
 }
 
-func (d *OGFWDetector) analyzeTCP(state *ogfwFlowState, payload []byte) *AnalyzeResult {
+func (d *OGFWDetector) analyzeTCP(state *ogfwFlowState, payload []byte, rev bool) (*AnalyzeResult, bool) {
 	for _, an := range d.tcpAnalyzers {
 		name := an.Name()
 		stream, ok := state.tcpStreams[name]
@@ -154,15 +158,21 @@ func (d *OGFWDetector) analyzeTCP(state *ogfwFlowState, payload []byte) *Analyze
 			stream = an.NewTCP(state.info, d.logger)
 			state.tcpStreams[name] = stream
 		}
-		update, _ := stream.Feed(false, state.packetCount == 1, false, 0, payload)
+		update, done := stream.Feed(rev, state.packetCount == 1, false, 0, payload)
 		if update != nil && update.M != nil {
-			return resultFromProps(name, update.M)
+			result := resultFromProps(name, update.M)
+			if result != nil {
+				return result, done && result.ProtoName != "TLS"
+			}
+		}
+		if done && (name == "trojan" || name == "fet") {
+			continue
 		}
 	}
-	return nil
+	return nil, false
 }
 
-func (d *OGFWDetector) analyzeUDP(state *ogfwFlowState, payload []byte) *AnalyzeResult {
+func (d *OGFWDetector) analyzeUDP(state *ogfwFlowState, payload []byte, rev bool) (*AnalyzeResult, bool) {
 	for _, an := range d.udpAnalyzers {
 		name := an.Name()
 		stream, ok := state.udpStreams[name]
@@ -170,12 +180,15 @@ func (d *OGFWDetector) analyzeUDP(state *ogfwFlowState, payload []byte) *Analyze
 			stream = an.NewUDP(state.udpInfo, d.logger)
 			state.udpStreams[name] = stream
 		}
-		update, _ := stream.Feed(false, payload)
+		update, done := stream.Feed(rev, payload)
 		if update != nil && update.M != nil {
-			return resultFromProps(name, update.M)
+			result := resultFromProps(name, update.M)
+			if result != nil {
+				return result, done
+			}
 		}
 	}
-	return nil
+	return nil, false
 }
 
 func resultFromProps(analyzerName string, props analyzer.PropMap) *AnalyzeResult {
