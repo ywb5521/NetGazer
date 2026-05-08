@@ -22,6 +22,40 @@ func NewFlowTracker() *FlowTracker {
 	}
 }
 
+func mergeAppProtocol(current, next, transport string) string {
+	if next == "" || next == transport {
+		return current
+	}
+	if current == "" || current == transport {
+		return next
+	}
+
+	currentEncrypted := strings.Contains(current, "Encrypted")
+	nextEncrypted := strings.Contains(next, "Encrypted")
+	currentBase := strings.TrimSpace(strings.TrimSuffix(current, "(Encrypted)"))
+	nextBase := strings.TrimSpace(strings.TrimSuffix(next, "(Encrypted)"))
+
+	if currentEncrypted && !nextEncrypted {
+		if nextBase == currentBase || len(nextBase) <= len(currentBase) {
+			return current
+		}
+		return nextBase + " (Encrypted)"
+	}
+	if !currentEncrypted && nextEncrypted {
+		if currentBase == nextBase || len(currentBase) > len(nextBase) {
+			return currentBase + " (Encrypted)"
+		}
+		return next
+	}
+	if nextEncrypted && len(nextBase) >= len(currentBase) {
+		return next
+	}
+	if len(next) > len(current) {
+		return next
+	}
+	return current
+}
+
 func (t *FlowTracker) Process(p capture.ParsedPacket, nodeID string) {
 	if p.Protocol == "ARP" || p.Protocol == "" {
 		return
@@ -56,16 +90,7 @@ func (t *FlowTracker) Process(p capture.ParsedPacket, nodeID string) {
 	f.Bytes += uint64(p.Length)
 	f.Packets++
 	f.LastSeen = now
-	// Prefer more detailed app protocol (enriched with SNI/Host), but preserve encrypted marker.
-	if p.AppProto != "" && p.AppProto != p.Protocol {
-		if f.AppProtocol == p.Protocol || len(p.AppProto) > len(f.AppProtocol) {
-			if strings.Contains(f.AppProtocol, "Encrypted") && !strings.Contains(p.AppProto, "Encrypted") {
-				f.AppProtocol = p.AppProto + " (Encrypted)"
-			} else {
-				f.AppProtocol = p.AppProto
-			}
-		}
-	}
+	f.AppProtocol = mergeAppProtocol(f.AppProtocol, p.AppProto, p.Protocol)
 }
 
 func flowKey(srcIP, dstIP string, srcPort, dstPort uint16, protocol string) string {

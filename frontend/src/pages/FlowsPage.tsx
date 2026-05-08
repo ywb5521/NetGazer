@@ -37,9 +37,11 @@ function getQuickFilters(t: any): QuickFilter[] {
 }
 
 function formatAppProto(raw: string): { proto: string; host?: string } {
-  const m = raw.match(/^(.+?)\s*\((.+?)\)$/);
-  if (m) return { proto: m[1], host: m[2] };
-  return { proto: raw };
+  const encryptedSuffix = raw.endsWith(' (Encrypted)');
+  const cleaned = encryptedSuffix ? raw.slice(0, -' (Encrypted)'.length) : raw;
+  const m = cleaned.match(/^(.+?)\s*\((.+?)\)$/);
+  if (m) return { proto: encryptedSuffix ? `${m[1]} (Encrypted)` : m[1], host: m[2] };
+  return { proto: encryptedSuffix ? `${cleaned} (Encrypted)` : cleaned };
 }
 
 export default function FlowsPage() {

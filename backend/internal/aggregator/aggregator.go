@@ -118,13 +118,7 @@ func (is *ifaceState) UpdateFrom(nodeID string, msg *netgazerv1.AgentMessage) {
 			existing.Bytes += f.Bytes
 			existing.Packets += f.Packets
 			existing.LastSeen = time.UnixMilli(f.LastSeenUnixMs)
-			if f.AppProtocol != "" && f.AppProtocol != f.Protocol {
-				if strings.Contains(existing.AppProtocol, "Encrypted") && !strings.Contains(f.AppProtocol, "Encrypted") {
-					existing.AppProtocol = f.AppProtocol + " (Encrypted)"
-				} else {
-					existing.AppProtocol = f.AppProtocol
-				}
-			}
+			existing.AppProtocol = trackerMergeAppProtocol(existing.AppProtocol, f.AppProtocol, f.Protocol)
 		} else {
 			is.Flows[f.Id] = &models.Flow{
 				ID:          f.Id,
@@ -1068,6 +1062,40 @@ func (a *Aggregator) PaginatedFlows(nodeID, iface, search, protoFilter, appFilte
 	}
 
 	return all, total
+}
+
+func trackerMergeAppProtocol(current, next, transport string) string {
+	if next == "" || next == transport {
+		return current
+	}
+	if current == "" || current == transport {
+		return next
+	}
+
+	currentEncrypted := strings.Contains(current, "Encrypted")
+	nextEncrypted := strings.Contains(next, "Encrypted")
+	currentBase := strings.TrimSpace(strings.TrimSuffix(current, "(Encrypted)"))
+	nextBase := strings.TrimSpace(strings.TrimSuffix(next, "(Encrypted)"))
+
+	if currentEncrypted && !nextEncrypted {
+		if nextBase == currentBase || len(nextBase) <= len(currentBase) {
+			return current
+		}
+		return nextBase + " (Encrypted)"
+	}
+	if !currentEncrypted && nextEncrypted {
+		if currentBase == nextBase || len(currentBase) > len(nextBase) {
+			return currentBase + " (Encrypted)"
+		}
+		return next
+	}
+	if nextEncrypted && len(nextBase) >= len(currentBase) {
+		return next
+	}
+	if len(next) > len(current) {
+		return next
+	}
+	return current
 }
 
 func fmtPort(p uint16) string {
