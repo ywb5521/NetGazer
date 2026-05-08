@@ -191,34 +191,44 @@ func (c *GRPCClient) Run(ctx context.Context) error {
 	defer ticker.Stop()
 
 	// Goroutine to read server messages
-	go c.readServerMessages(ctx)
+	recvErrCh := make(chan error, 1)
+	go func() {
+		recvErrCh <- c.readServerMessages(ctx)
+	}()
 
 	for {
 		select {
 		case <-ctx.Done():
 			c.stream.CloseSend()
 			return nil
+		case err := <-recvErrCh:
+			if err == nil {
+				return nil
+			}
+			return fmt.Errorf("recv server message: %w", err)
 		case <-ticker.C:
-			for _, msg := range c.buildSnapshots() {
-				if err := c.stream.Send(msg); err != nil {
-					if err == io.EOF {
-						return nil
-					}
-					return fmt.Errorf("send snapshot: %w", err)
+			msg := c.buildSnapshot()
+			if err := c.stream.Send(msg); err != nil {
+				if err == io.EOF {
+					return nil
 				}
+				return fmt.Errorf("send snapshot: %w", err)
 			}
 		}
 	}
 }
 
-func (c *GRPCClient) readServerMessages(ctx context.Context) {
+func (c *GRPCClient) readServerMessages(ctx context.Context) error {
 	for {
 		msg, err := c.stream.Recv()
 		if err != nil {
-			if err != io.EOF && ctx.Err() == nil {
+			if ctx.Err() != nil {
+				return nil
+			}
+			if err != io.EOF {
 				log.Printf("[agent] stream recv error: %v", err)
 			}
-			return
+			return err
 		}
 		switch m := msg.Message.(type) {
 		case *netgazerv1.ServerMessage_Ack:
@@ -240,21 +250,62 @@ func (c *GRPCClient) readServerMessages(ctx context.Context) {
 	}
 }
 
-func (c *GRPCClient) buildSnapshots() []*netgazerv1.AgentMessage {
+func (c *GRPCClient) buildSnapshot() *netgazerv1.AgentMessage {
 	now := time.Now()
 	intervalSec := c.interval.Seconds()
 	if intervalSec <= 0 {
 		intervalSec = 1
 	}
 
-	var msgs []*netgazerv1.AgentMessage
-
-	for _, pipe := range c.ifacePipes {
-		msg := c.buildInterfaceSnapshot(pipe, now, intervalSec)
-		msgs = append(msgs, msg)
+	msg := &netgazerv1.AgentMessage{
+		NodeId:          c.nodeID,
+		TimestampUnixMs: now.UnixMilli(),
 	}
 
-	return msgs
+	var totalBytesPerSec, totalPacketsPerSec float64
+	var totalFlows int32
+	ifaceSnapshots := make([]*netgazerv1.InterfaceSnapshot, 0, len(c.ifacePipes))
+
+	for _, pipe := range c.ifacePipes {
+		ifaceMsg := c.buildInterfaceSnapshot(pipe, now, intervalSec)
+		ifaceSnapshots = append(ifaceSnapshots, &netgazerv1.InterfaceSnapshot{
+			Interface:      ifaceMsg.Interface,
+			Snapshot:       ifaceMsg.Snapshot,
+			Hosts:          ifaceMsg.Hosts,
+			Flows:          ifaceMsg.Flows,
+			Protocols:      ifaceMsg.Protocols,
+			DnsQueries:     ifaceMsg.DnsQueries,
+			PacketSizeDist: ifaceMsg.PacketSizeDist,
+			TcpMetrics:     ifaceMsg.TcpMetrics,
+			Latency:        ifaceMsg.Latency,
+		})
+		if ifaceMsg.Snapshot != nil {
+			totalBytesPerSec += ifaceMsg.Snapshot.BytesPerSec
+			totalPacketsPerSec += ifaceMsg.Snapshot.PacketsPerSec
+			totalFlows += ifaceMsg.Snapshot.FlowsCount
+		}
+	}
+
+	msg.Snapshot = &netgazerv1.TrafficSnapshot{
+		BytesPerSec:   totalBytesPerSec,
+		PacketsPerSec: totalPacketsPerSec,
+		FlowsCount:    totalFlows,
+	}
+	msg.InterfaceSnapshots = ifaceSnapshots
+
+	if c.systemHealth != nil {
+		msg.SystemHealth = &netgazerv1.SystemHealth{
+			CpuPercent:     c.systemHealth.CPUPercent,
+			MemPercent:     c.systemHealth.MemPercent,
+			MemUsedBytes:   c.systemHealth.MemUsedBytes,
+			MemTotalBytes:  c.systemHealth.MemTotalBytes,
+			DiskFreeBytes:  c.systemHealth.DiskFreeBytes,
+			DiskTotalBytes: c.systemHealth.DiskTotalBytes,
+			UptimeSeconds:  c.systemHealth.UptimeSeconds,
+		}
+	}
+
+	return msg
 }
 
 func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, intervalSec float64) *netgazerv1.AgentMessage {
@@ -361,19 +412,6 @@ func (c *GRPCClient) buildInterfaceSnapshot(pipe *IfacePipe, now time.Time, inte
 		DnsQueries:     pbDNS,
 		PacketSizeDist: pbPSD,
 		TcpMetrics:     pbTCP,
-	}
-
-	// System health is per-node, only attach on first interface to avoid duplication
-	if c.systemHealth != nil {
-		msg.SystemHealth = &netgazerv1.SystemHealth{
-			CpuPercent:     c.systemHealth.CPUPercent,
-			MemPercent:     c.systemHealth.MemPercent,
-			MemUsedBytes:   c.systemHealth.MemUsedBytes,
-			MemTotalBytes:  c.systemHealth.MemTotalBytes,
-			DiskFreeBytes:  c.systemHealth.DiskFreeBytes,
-			DiskTotalBytes: c.systemHealth.DiskTotalBytes,
-			UptimeSeconds:  c.systemHealth.UptimeSeconds,
-		}
 	}
 
 	return msg

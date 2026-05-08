@@ -297,6 +297,11 @@ func (a *Aggregator) SetNodeOffline(nodeID string) {
 }
 
 func (a *Aggregator) Ingest(msg *netgazerv1.AgentMessage) {
+	if len(msg.InterfaceSnapshots) > 0 {
+		a.ingestInterfaceSnapshots(msg)
+		return
+	}
+
 	iface := msg.Interface
 
 	a.mu.Lock()
@@ -324,6 +329,63 @@ func (a *Aggregator) Ingest(msg *netgazerv1.AgentMessage) {
 	is.UpdateFrom(msg.NodeId, msg)
 
 	// System health (per-node, not per-interface)
+	if msg.SystemHealth != nil {
+		ns.mu.Lock()
+		ns.SystemHealth = &models.SystemHealthJSON{
+			CPUPercent:     msg.SystemHealth.CpuPercent,
+			MemPercent:     msg.SystemHealth.MemPercent,
+			MemUsedBytes:   msg.SystemHealth.MemUsedBytes,
+			MemTotalBytes:  msg.SystemHealth.MemTotalBytes,
+			DiskFreeBytes:  msg.SystemHealth.DiskFreeBytes,
+			DiskTotalBytes: msg.SystemHealth.DiskTotalBytes,
+			UptimeSeconds:  msg.SystemHealth.UptimeSeconds,
+		}
+		ns.mu.Unlock()
+	}
+}
+
+func (a *Aggregator) ingestInterfaceSnapshots(msg *netgazerv1.AgentMessage) {
+	a.mu.Lock()
+	ns, ok := a.nodes[msg.NodeId]
+	if !ok {
+		ns = &nodeState{
+			NodeID: msg.NodeId,
+			Online: true,
+			ifaces: make(map[string]*ifaceState),
+		}
+		a.nodes[msg.NodeId] = ns
+	}
+	a.mu.Unlock()
+
+	ns.mu.Lock()
+	ns.LastSeen = time.Now()
+	ns.Online = true
+	ns.mu.Unlock()
+
+	for _, ifaceMsg := range msg.InterfaceSnapshots {
+		iface := ifaceMsg.Interface
+		if iface == "" && len(ns.Interfaces) > 0 {
+			iface = ns.Interfaces[0]
+		}
+		ns.mu.Lock()
+		is := ns.getOrCreateIface(iface)
+		ns.mu.Unlock()
+
+		is.UpdateFrom(msg.NodeId, &netgazerv1.AgentMessage{
+			NodeId:          msg.NodeId,
+			TimestampUnixMs: msg.TimestampUnixMs,
+			Interface:       iface,
+			Snapshot:        ifaceMsg.Snapshot,
+			Hosts:           ifaceMsg.Hosts,
+			Flows:           ifaceMsg.Flows,
+			Protocols:       ifaceMsg.Protocols,
+			DnsQueries:      ifaceMsg.DnsQueries,
+			PacketSizeDist:  ifaceMsg.PacketSizeDist,
+			TcpMetrics:      ifaceMsg.TcpMetrics,
+			Latency:         ifaceMsg.Latency,
+		})
+	}
+
 	if msg.SystemHealth != nil {
 		ns.mu.Lock()
 		ns.SystemHealth = &models.SystemHealthJSON{

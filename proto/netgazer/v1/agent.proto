@@ -36,6 +36,19 @@ message AgentMessage {
   string interface = 10;
   TCPMetrics tcp_metrics = 11;
   LatencySnapshot latency = 12;
+  repeated InterfaceSnapshot interface_snapshots = 13;
+}
+
+message InterfaceSnapshot {
+  string interface = 1;
+  TrafficSnapshot snapshot = 2;
+  repeated Host hosts = 3;
+  repeated Flow flows = 4;
+  repeated ProtocolStat protocols = 5;
+  repeated DNSQuery dns_queries = 6;
+  PacketSizeDist packet_size_dist = 7;
+  TCPMetrics tcp_metrics = 8;
+  LatencySnapshot latency = 9;
 }
 
 message SystemHealth {

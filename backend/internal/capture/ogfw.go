@@ -185,38 +185,38 @@ func resultFromProps(analyzerName string, props analyzer.PropMap) *AnalyzeResult
 	result := &AnalyzeResult{Props: props}
 
 	switch analyzerName {
-	case "HTTP":
+	case "http", "HTTP":
 		result.ProtoName = "HTTP"
-	case "TLS":
+	case "tls", "TLS":
 		result.ProtoName = "TLS"
-	case "SSH":
+	case "ssh", "SSH":
 		result.ProtoName = "SSH"
-	case "SOCKS":
+	case "socks", "SOCKS":
 		result.ProtoName = "SOCKS"
 		if v := props.Get("version"); v != nil {
 			if s, ok := v.(string); ok {
 				result.ProtoName = s
 			}
 		}
-	case "Trojan":
+	case "trojan", "Trojan":
 		if v := props.Get("yes"); v != nil {
 			if yes, ok := v.(bool); ok && yes {
 				result.ProtoName = "Trojan"
 			}
 		}
-	case "FET":
+	case "fet", "FET":
 		if v := props.Get("yes"); v != nil {
 			if yes, ok := v.(bool); ok && yes {
 				result.ProtoName = "Encrypted"
 			}
 		}
-	case "DNS":
+	case "dns", "DNS":
 		result.ProtoName = "DNS"
-	case "QUIC":
+	case "quic", "QUIC":
 		result.ProtoName = "QUIC"
-	case "WireGuard":
+	case "wireguard", "WireGuard":
 		result.ProtoName = "WireGuard"
-	case "OpenVPN":
+	case "openvpn", "OpenVPN":
 		result.ProtoName = "OpenVPN"
 	}
 

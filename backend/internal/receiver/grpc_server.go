@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	netgazerv1 "github.com/netgazer/backend/gen/netgazer/v1"
 	"github.com/netgazer/backend/internal/aggregator"
@@ -61,7 +62,7 @@ func (s *GRPCServer) Register(ctx context.Context, req *netgazerv1.RegisterReque
 	return &netgazerv1.RegisterResponse{
 		Accepted:           true,
 		Message:            "welcome",
-		SnapshotIntervalMs: 1000,
+		SnapshotIntervalMs: 0,
 	}, nil
 }
 
@@ -109,6 +110,21 @@ func (s *GRPCServer) StreamSnapshots(stream netgazerv1.AgentService_StreamSnapsh
 		}
 
 		s.agg.Ingest(msg)
+
+		if err := stream.Send(&netgazerv1.ServerMessage{
+			Message: &netgazerv1.ServerMessage_Ack{
+				Ack: &netgazerv1.Ack{ReceivedTimestampUnixMs: time.Now().UnixMilli()},
+			},
+		}); err != nil {
+			log.Printf("[server] stream ack error to %s: %v", nodeID, err)
+			if nodeID != "" {
+				s.agg.SetNodeOffline(nodeID)
+				s.mu.Lock()
+				delete(s.clients, nodeID)
+				s.mu.Unlock()
+			}
+			return err
+		}
 
 		// Optional: send ack
 		// stream.Send(&netgazerv1.ServerMessage{...})
